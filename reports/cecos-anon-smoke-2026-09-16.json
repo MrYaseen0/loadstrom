@@ -1,0 +1,121 @@
+{
+  "generatedAt": "2026-09-16T12:31:07.145Z",
+  "state": "finished",
+  "error": null,
+  "config": {
+    "url": "https://cecos.edu.pk/",
+    "host": "cecos.edu.pk",
+    "method": "GET",
+    "mode": "load",
+    "concurrency": 1,
+    "rps": 0,
+    "durationSec": 4,
+    "rampUpSec": 1,
+    "timeoutMs": 15000,
+    "httpVersion": "1.1",
+    "trackPhases": true,
+    "pacing": "standard",
+    "thresholds": {
+      "maxErrorRatePct": 1,
+      "maxP95Ms": 1000,
+      "minRps": 0
+    },
+    "stress": {
+      "start": 50,
+      "step": 50,
+      "max": 500,
+      "stepDurationSec": 30
+    },
+    "headers": [
+      "user-agent",
+      "accept",
+      "accept-language",
+      "accept-encoding",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "sec-fetch-user",
+      "upgrade-insecure-requests"
+    ],
+    "hasBody": false,
+    "autoRotate": false,
+    "torControlPort": 9151,
+    "blockThresholdPct": 70
+  },
+  "result": {
+    "status": "fail",
+    "headline": "Not handled: 100.00% errors, p95 44660 ms — 0 responses from 1 attempts (0 attempts/s offered). Failures happened before any response, so this measures the load path, not the server.",
+    "reasons": [
+      "Error rate 100.00% exceeds the allowed 1%.",
+      "1 of those failures were timeouts (100.00% of traffic).",
+      "p95 latency 44660 ms exceeds the allowed 1000 ms."
+    ],
+    "recommendations": [
+      "No request got a response (0 completed, 0 bytes) — failures happened in the load path (proxy/Tor/network), so this result says nothing about the target server's capacity.",
+      "Tor carries ~10–20 concurrent users per circuit: drop concurrency to 10–20, raise timeoutMs to 30000+, and re-run. Hundreds of users through one exit node only queue and time out.",
+      "Check the rotation log: repeated \"Tor control timeout\" means the control port is unreachable (Tor Browser 9151 vs system tor 9051), rate-limited (NEWNYM needs ~10s between calls), or needs TOR_CONTROL_PASSWORD. Fix that before re-running.",
+      "Prove the proxy first with POST /api/test-proxy against https://httpbin.org/ip (an IP-echo endpoint), not against the target page — an HTML page cannot show the exit IP.",
+      "Latency percentiles are estimated from a reservoir sample of 1 requests (exact count/avg/min/max)."
+    ]
+  },
+  "metrics": {
+    "elapsedSec": 44.67,
+    "attempted": 1,
+    "completed": 0,
+    "ok": 0,
+    "failed": 1,
+    "timeouts": 1,
+    "connErrors": 0,
+    "bytes": 0,
+    "rps": 0,
+    "attemptedRps": 0.022387892627666956,
+    "errRate": 1,
+    "latency": {
+      "min": 44659.64940000139,
+      "max": 44659.64940000139,
+      "avg": 44659.64940000139,
+      "p50": 44659.64940000139,
+      "p90": 44659.64940000139,
+      "p95": 44659.64940000139,
+      "p99": 44659.64940000139,
+      "dns_p50": 1.5194999985396862,
+      "dns_p95": 1.5194999985396862,
+      "dns_p99": 1.5194999985396862,
+      "tcp_p50": 0.015800001099705696,
+      "tcp_p95": 0.015800001099705696,
+      "tcp_p99": 0.015800001099705696,
+      "tls_p50": 44654.11690000072,
+      "tls_p95": 44654.11690000072,
+      "tls_p99": 44654.11690000072,
+      "ttfb_p50": 44659.64940000139,
+      "ttfb_p95": 44659.64940000139,
+      "ttfb_p99": 44659.64940000139,
+      "download_p50": 0,
+      "download_p95": 0,
+      "download_p99": 0
+    },
+    "statusCounts": {},
+    "sampleSize": 1,
+    "timeline": [
+      {
+        "t": 44,
+        "count": 1,
+        "rps": 1,
+        "ok": 0,
+        "err": 1,
+        "errRate": 1,
+        "avg": 44659.64940000139,
+        "p95": 44659.64940000139
+      }
+    ]
+  },
+  "steps": [],
+  "breakingPoint": null,
+  "abortReason": null,
+  "wallClockSec": 44.66,
+  "rotationCount": 0,
+  "blockedProxies": []
+}

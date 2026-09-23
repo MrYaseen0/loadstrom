@@ -1,0 +1,300 @@
+{
+  "generatedAt": "2026-09-16T17:40:17.988Z",
+  "state": "finished",
+  "error": null,
+  "config": {
+    "url": "http://127.0.0.1:8787/",
+    "host": "127.0.0.1:8787",
+    "method": "GET",
+    "mode": "stress",
+    "concurrency": 10,
+    "rps": 0,
+    "durationSec": 30,
+    "rampUpSec": 1,
+    "timeoutMs": 5000,
+    "httpVersion": "1.1",
+    "trackPhases": true,
+    "pacing": "standard",
+    "thresholds": {
+      "maxErrorRatePct": 100,
+      "maxP95Ms": 10000,
+      "minRps": 0
+    },
+    "stress": {
+      "start": 10,
+      "step": 10,
+      "max": 30,
+      "stepDurationSec": 5
+    },
+    "headers": [
+      "user-agent",
+      "accept",
+      "accept-language",
+      "accept-encoding",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "sec-fetch-user",
+      "upgrade-insecure-requests"
+    ],
+    "hasBody": false,
+    "autoRotate": false,
+    "torControlPort": 9151,
+    "blockThresholdPct": 70
+  },
+  "result": {
+    "status": "pass",
+    "headline": "Handled it: 14,442 successful requests (of 14,442 completed) at 958 rps, p95 50 ms, error rate 0.00%.",
+    "reasons": [],
+    "recommendations": [
+      "This load was handled cleanly. Push higher: increase concurrency in Stress mode to find where it starts to bend, then provision ~2x that headroom.",
+      "Latency percentiles are estimated from a reservoir sample of 14,442 requests (exact count/avg/min/max)."
+    ]
+  },
+  "metrics": {
+    "elapsedSec": 15.08,
+    "attempted": 14442,
+    "completed": 14442,
+    "ok": 14442,
+    "failed": 0,
+    "timeouts": 0,
+    "connErrors": 0,
+    "bytes": 246972642,
+    "rps": 957.6923076923077,
+    "attemptedRps": 957.6923076923077,
+    "errRate": 0,
+    "latency": {
+      "min": 4.4666999988257885,
+      "max": 123.32299999892712,
+      "avg": 20.71946170890652,
+      "p50": 17.46499999985099,
+      "p90": 34.24439999833703,
+      "p95": 49.953500002622604,
+      "p99": 82.48740000277758,
+      "dns_p50": 0,
+      "dns_p95": 0,
+      "dns_p99": 0,
+      "tcp_p50": 17.27019999921322,
+      "tcp_p95": 49.72450000047684,
+      "tcp_p99": 82.07979999855161,
+      "tls_p50": 0,
+      "tls_p95": 0,
+      "tls_p99": 0,
+      "ttfb_p50": 0.07040000334382057,
+      "ttfb_p95": 0.1550000011920929,
+      "ttfb_p99": 0.3377999998629093,
+      "download_p50": 0.11329999938607216,
+      "download_p95": 0.25200000032782555,
+      "download_p99": 0.7218999974429607
+    },
+    "statusCounts": {
+      "200": 14442
+    },
+    "sampleSize": 14442,
+    "timeline": [
+      {
+        "t": 0,
+        "count": 923,
+        "rps": 923,
+        "ok": 923,
+        "err": 0,
+        "errRate": 0,
+        "avg": 10.59460097519461,
+        "p95": 21.59010000154376
+      },
+      {
+        "t": 1,
+        "count": 827,
+        "rps": 827,
+        "ok": 827,
+        "err": 0,
+        "errRate": 0,
+        "avg": 11.919954897234488,
+        "p95": 35.47910000011325
+      },
+      {
+        "t": 2,
+        "count": 606,
+        "rps": 606,
+        "ok": 606,
+        "err": 0,
+        "errRate": 0,
+        "avg": 16.4530820132851,
+        "p95": 21.203099999576807
+      },
+      {
+        "t": 3,
+        "count": 929,
+        "rps": 929,
+        "ok": 929,
+        "err": 0,
+        "errRate": 0,
+        "avg": 10.704324757778542,
+        "p95": 19.694499999284744
+      },
+      {
+        "t": 4,
+        "count": 839,
+        "rps": 839,
+        "ok": 839,
+        "err": 0,
+        "errRate": 0,
+        "avg": 11.807724076317662,
+        "p95": 20.336400002241135
+      },
+      {
+        "t": 5,
+        "count": 812,
+        "rps": 812,
+        "ok": 812,
+        "err": 0,
+        "errRate": 0,
+        "avg": 23.997423891611213,
+        "p95": 49.22350000217557
+      },
+      {
+        "t": 6,
+        "count": 647,
+        "rps": 647,
+        "ok": 647,
+        "err": 0,
+        "errRate": 0,
+        "avg": 30.34986383300361,
+        "p95": 37.14589999988675
+      },
+      {
+        "t": 7,
+        "count": 1383,
+        "rps": 1383,
+        "ok": 1383,
+        "err": 0,
+        "errRate": 0,
+        "avg": 14.620012942944005,
+        "p95": 31.016100000590086
+      },
+      {
+        "t": 8,
+        "count": 1133,
+        "rps": 1133,
+        "ok": 1133,
+        "err": 0,
+        "errRate": 0,
+        "avg": 16.848155869320628,
+        "p95": 26.079599998891354
+      },
+      {
+        "t": 9,
+        "count": 933,
+        "rps": 933,
+        "ok": 933,
+        "err": 0,
+        "errRate": 0,
+        "avg": 22.067117899213095,
+        "p95": 80.03839999809861
+      },
+      {
+        "t": 10,
+        "count": 1153,
+        "rps": 1153,
+        "ok": 1153,
+        "err": 0,
+        "errRate": 0,
+        "avg": 25.0651041629683,
+        "p95": 25.689899999648333
+      },
+      {
+        "t": 11,
+        "count": 969,
+        "rps": 969,
+        "ok": 969,
+        "err": 0,
+        "errRate": 0,
+        "avg": 30.42221475755498,
+        "p95": 92.28599999845028
+      },
+      {
+        "t": 12,
+        "count": 896,
+        "rps": 896,
+        "ok": 896,
+        "err": 0,
+        "errRate": 0,
+        "avg": 33.98998761159601,
+        "p95": 58.13080000132322
+      },
+      {
+        "t": 13,
+        "count": 1198,
+        "rps": 1198,
+        "ok": 1198,
+        "err": 0,
+        "errRate": 0,
+        "avg": 24.994925375617356,
+        "p95": 27.37790000066161
+      },
+      {
+        "t": 14,
+        "count": 1134,
+        "rps": 1134,
+        "ok": 1134,
+        "err": 0,
+        "errRate": 0,
+        "avg": 25.22690529097693,
+        "p95": 30.066100001335144
+      },
+      {
+        "t": 15,
+        "count": 60,
+        "rps": 60,
+        "ok": 60,
+        "err": 0,
+        "errRate": 0,
+        "avg": 56.12499666654815,
+        "p95": 92.63800000026822
+      }
+    ]
+  },
+  "steps": [
+    {
+      "concurrency": 10,
+      "rps": 827.5724275724276,
+      "p95": 25.429199997335672,
+      "avg": 11.97837580882826,
+      "errRate": 0,
+      "errPct": 0,
+      "requests": 4142,
+      "durationSec": 5,
+      "verdict": "pass"
+    },
+    {
+      "concurrency": 20,
+      "rps": 983.8291076063085,
+      "p95": 42.210799999535084,
+      "avg": 20.232697605509944,
+      "errRate": 0,
+      "errPct": 0,
+      "requests": 4928,
+      "durationSec": 5,
+      "verdict": "pass"
+    },
+    {
+      "concurrency": 30,
+      "rps": 1071.1864406779662,
+      "p95": 63.12089999765158,
+      "avg": 27.90567751301346,
+      "errRate": 0,
+      "errPct": 0,
+      "requests": 5372,
+      "durationSec": 5,
+      "verdict": "pass"
+    }
+  ],
+  "breakingPoint": null,
+  "abortReason": null,
+  "wallClockSec": 15.07,
+  "rotationCount": 0,
+  "blockedProxies": []
+}

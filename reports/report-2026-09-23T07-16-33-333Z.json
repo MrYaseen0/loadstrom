@@ -1,0 +1,873 @@
+{
+  "generatedAt": "2026-09-23T07:16:33.327Z",
+  "state": "finished",
+  "error": null,
+  "config": {
+    "url": "https://www.legacy-international1.com",
+    "host": "www.legacy-international1.com",
+    "method": "GET",
+    "mode": "load",
+    "concurrency": 10000,
+    "rps": 0,
+    "durationSec": 0,
+    "rampUpSec": 5,
+    "timeoutMs": 10000,
+    "httpVersion": "1.1",
+    "trackPhases": true,
+    "pacing": "standard",
+    "thresholds": {
+      "maxErrorRatePct": 1,
+      "maxP95Ms": 1000,
+      "minRps": 0
+    },
+    "stress": {
+      "start": 20,
+      "step": 20,
+      "max": 200,
+      "stepDurationSec": 15
+    },
+    "headers": [
+      "user-agent",
+      "accept",
+      "accept-language",
+      "accept-encoding",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "sec-fetch-user",
+      "upgrade-insecure-requests"
+    ],
+    "hasBody": false,
+    "autoRotate": true,
+    "torControlPort": 9151,
+    "blockThresholdPct": 70
+  },
+  "result": {
+    "status": "fail",
+    "headline": "Not handled: 95.18% errors, p95 68484 ms at 49 rps.",
+    "reasons": [
+      "Error rate 95.18% exceeds the allowed 1%.",
+      "6171 of those failures were timeouts (58.78% of traffic).",
+      "p95 latency 68484 ms exceeds the allowed 1000 ms."
+    ],
+    "recommendations": [
+      "The server started failing under this load. Identify the bottleneck before increasing traffic: check CPU/RAM/disk I/O, database connection pools, worker/process counts, timeouts, and upstream rate limits.",
+      "High tail latency (p95 68484 ms, p99 70694 ms) usually points to queueing — add capacity (horizontal scale) or a cache, and set sane upstream timeouts.",
+      "Errors at 95.18% often mean exhaustion: connection limits, too few app workers, or 5xx from an overwhelmed dependency. Check server logs for the exact status codes.",
+      "Latency percentiles are estimated from a reservoir sample of 10,499 requests (exact count/avg/min/max)."
+    ]
+  },
+  "metrics": {
+    "elapsedSec": 87.53,
+    "attempted": 10499,
+    "completed": 4316,
+    "ok": 506,
+    "failed": 9993,
+    "timeouts": 6171,
+    "connErrors": 12,
+    "bytes": 129928111,
+    "rps": 49.3059918889587,
+    "attemptedRps": 119.94059519049523,
+    "errRate": 0.9518049338032194,
+    "latency": {
+      "min": 11500.525599999353,
+      "max": 77971.55030000024,
+      "avg": 45787.91195197625,
+      "p50": 41530.212900001556,
+      "p90": 67605.60529999994,
+      "p95": 68484.18620000035,
+      "p99": 70693.9570000004,
+      "dns_p50": 0,
+      "dns_p95": 0.45869999937713146,
+      "dns_p99": 1.1507999990135431,
+      "tcp_p50": 0.0032999999821186066,
+      "tcp_p95": 0.010499998927116394,
+      "tcp_p99": 0.023200001567602158,
+      "tls_p50": 23148.414899999276,
+      "tls_p95": 41879.147800000384,
+      "tls_p99": 43646.92690000124,
+      "ttfb_p50": 11427.296900000423,
+      "ttfb_p95": 41415.313899999484,
+      "ttfb_p99": 43768.32660000026,
+      "download_p50": 1.146500000730157,
+      "download_p95": 37758.89509999938,
+      "download_p99": 38375.23930000141
+    },
+    "statusCounts": {
+      "200": 506,
+      "403": 3810
+    },
+    "sampleSize": 10499,
+    "timeline": [
+      {
+        "t": 12,
+        "count": 1,
+        "rps": 1,
+        "ok": 0,
+        "err": 1,
+        "errRate": 1,
+        "avg": 11500.525599999353,
+        "p95": 11500.525599999353
+      },
+      {
+        "t": 13,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 14,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 15,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 16,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 17,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 18,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 19,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 20,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 21,
+        "count": 35,
+        "rps": 35,
+        "ok": 0,
+        "err": 35,
+        "errRate": 1,
+        "avg": 16586.103925714375,
+        "p95": 16860.7201000005
+      },
+      {
+        "t": 22,
+        "count": 440,
+        "rps": 440,
+        "ok": 0,
+        "err": 440,
+        "errRate": 1,
+        "avg": 14214.879186590904,
+        "p95": 22636.212200000882
+      },
+      {
+        "t": 23,
+        "count": 247,
+        "rps": 247,
+        "ok": 247,
+        "err": 0,
+        "errRate": 0,
+        "avg": 22806.174054250958,
+        "p95": 22964.623800000176
+      },
+      {
+        "t": 24,
+        "count": 6,
+        "rps": 6,
+        "ok": 6,
+        "err": 0,
+        "errRate": 0,
+        "avg": 22986.299866667327,
+        "p95": 23181.94019999914
+      },
+      {
+        "t": 25,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 26,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 27,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 28,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 29,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 30,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 31,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 32,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 33,
+        "count": 535,
+        "rps": 535,
+        "ok": 0,
+        "err": 535,
+        "errRate": 1,
+        "avg": 25272.590315327085,
+        "p95": 24469.901100000367
+      },
+      {
+        "t": 34,
+        "count": 163,
+        "rps": 163,
+        "ok": 0,
+        "err": 163,
+        "errRate": 1,
+        "avg": 32730.951682822128,
+        "p95": 32949.332700001076
+      },
+      {
+        "t": 35,
+        "count": 46,
+        "rps": 46,
+        "ok": 0,
+        "err": 46,
+        "errRate": 1,
+        "avg": 32822.23023913035,
+        "p95": 32853.30449999869
+      },
+      {
+        "t": 36,
+        "count": 256,
+        "rps": 256,
+        "ok": 0,
+        "err": 256,
+        "errRate": 1,
+        "avg": 33279.42400703124,
+        "p95": 33569.71270000003
+      },
+      {
+        "t": 37,
+        "count": 256,
+        "rps": 256,
+        "ok": 0,
+        "err": 256,
+        "errRate": 1,
+        "avg": 34169.83476250012,
+        "p95": 34418.05670000054
+      },
+      {
+        "t": 38,
+        "count": 128,
+        "rps": 128,
+        "ok": 0,
+        "err": 128,
+        "errRate": 1,
+        "avg": 34839.78647968749,
+        "p95": 34888.357000000775
+      },
+      {
+        "t": 39,
+        "count": 458,
+        "rps": 458,
+        "ok": 0,
+        "err": 458,
+        "errRate": 1,
+        "avg": 35336.57182248914,
+        "p95": 36672.67960000038
+      },
+      {
+        "t": 40,
+        "count": 450,
+        "rps": 450,
+        "ok": 0,
+        "err": 450,
+        "errRate": 1,
+        "avg": 35005.92628933332,
+        "p95": 36009.26830000058
+      },
+      {
+        "t": 41,
+        "count": 205,
+        "rps": 205,
+        "ok": 0,
+        "err": 205,
+        "errRate": 1,
+        "avg": 35878.07209853657,
+        "p95": 37140.67040000111
+      },
+      {
+        "t": 42,
+        "count": 694,
+        "rps": 694,
+        "ok": 59,
+        "err": 635,
+        "errRate": 0.9149855907780979,
+        "avg": 35294.166280115234,
+        "p95": 37658.75770000182
+      },
+      {
+        "t": 43,
+        "count": 332,
+        "rps": 332,
+        "ok": 76,
+        "err": 256,
+        "errRate": 0.7710843373493976,
+        "avg": 37194.39316506021,
+        "p95": 38237.29040000029
+      },
+      {
+        "t": 44,
+        "count": 118,
+        "rps": 118,
+        "ok": 118,
+        "err": 0,
+        "errRate": 0,
+        "avg": 34663.71643644077,
+        "p95": 34722.295099999756
+      },
+      {
+        "t": 45,
+        "count": 128,
+        "rps": 128,
+        "ok": 0,
+        "err": 128,
+        "errRate": 1,
+        "avg": 39286.95457812496,
+        "p95": 39363.29619999975
+      },
+      {
+        "t": 46,
+        "count": 256,
+        "rps": 256,
+        "ok": 0,
+        "err": 256,
+        "errRate": 1,
+        "avg": 40500.97947617187,
+        "p95": 40783.276199998334
+      },
+      {
+        "t": 47,
+        "count": 256,
+        "rps": 256,
+        "ok": 0,
+        "err": 256,
+        "errRate": 1,
+        "avg": 41185.677021875024,
+        "p95": 41469.06599999964
+      },
+      {
+        "t": 48,
+        "count": 231,
+        "rps": 231,
+        "ok": 0,
+        "err": 231,
+        "errRate": 1,
+        "avg": 41849.683938960996,
+        "p95": 42408.72980000079
+      },
+      {
+        "t": 49,
+        "count": 109,
+        "rps": 109,
+        "ok": 0,
+        "err": 109,
+        "errRate": 1,
+        "avg": 41932.64687339451,
+        "p95": 41977.21900000051
+      },
+      {
+        "t": 50,
+        "count": 129,
+        "rps": 129,
+        "ok": 0,
+        "err": 129,
+        "errRate": 1,
+        "avg": 43824.779886046555,
+        "p95": 44813.90020000003
+      },
+      {
+        "t": 51,
+        "count": 742,
+        "rps": 742,
+        "ok": 0,
+        "err": 742,
+        "errRate": 1,
+        "avg": 38228.52832425866,
+        "p95": 41967.96729999967
+      },
+      {
+        "t": 52,
+        "count": 2,
+        "rps": 2,
+        "ok": 0,
+        "err": 2,
+        "errRate": 1,
+        "avg": 44058.267500000075,
+        "p95": 44066.69549999945
+      },
+      {
+        "t": 53,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 54,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 55,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 56,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 57,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 58,
+        "count": 8,
+        "rps": 8,
+        "ok": 0,
+        "err": 8,
+        "errRate": 1,
+        "avg": 33144.273949999595,
+        "p95": 33148.8543999996
+      },
+      {
+        "t": 59,
+        "count": 3,
+        "rps": 3,
+        "ok": 0,
+        "err": 3,
+        "errRate": 1,
+        "avg": 52304.32233333277,
+        "p95": 53015.48980000056
+      },
+      {
+        "t": 60,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 61,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 62,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 63,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 64,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 65,
+        "count": 211,
+        "rps": 211,
+        "ok": 0,
+        "err": 211,
+        "errRate": 1,
+        "avg": 56387.18702180093,
+        "p95": 56553.44570000097
+      },
+      {
+        "t": 66,
+        "count": 180,
+        "rps": 180,
+        "ok": 0,
+        "err": 180,
+        "errRate": 1,
+        "avg": 56767.04411166678,
+        "p95": 57186.152800001204
+      },
+      {
+        "t": 67,
+        "count": 71,
+        "rps": 71,
+        "ok": 0,
+        "err": 71,
+        "errRate": 1,
+        "avg": 57638.851743662126,
+        "p95": 57863.32670000009
+      },
+      {
+        "t": 68,
+        "count": 188,
+        "rps": 188,
+        "ok": 0,
+        "err": 188,
+        "errRate": 1,
+        "avg": 54158.70285000001,
+        "p95": 58907.27500000037
+      },
+      {
+        "t": 69,
+        "count": 217,
+        "rps": 217,
+        "ok": 0,
+        "err": 217,
+        "errRate": 1,
+        "avg": 54674.73137926272,
+        "p95": 60238.90029999986
+      },
+      {
+        "t": 70,
+        "count": 212,
+        "rps": 212,
+        "ok": 0,
+        "err": 212,
+        "errRate": 1,
+        "avg": 58364.64535801876,
+        "p95": 61214.53509999998
+      },
+      {
+        "t": 71,
+        "count": 280,
+        "rps": 280,
+        "ok": 0,
+        "err": 280,
+        "errRate": 1,
+        "avg": 61034.36964821424,
+        "p95": 62027.066400000826
+      },
+      {
+        "t": 72,
+        "count": 339,
+        "rps": 339,
+        "ok": 0,
+        "err": 339,
+        "errRate": 1,
+        "avg": 60515.91042418881,
+        "p95": 63076.84830000065
+      },
+      {
+        "t": 73,
+        "count": 176,
+        "rps": 176,
+        "ok": 0,
+        "err": 176,
+        "errRate": 1,
+        "avg": 60121.44337784084,
+        "p95": 63951.47809999995
+      },
+      {
+        "t": 74,
+        "count": 84,
+        "rps": 84,
+        "ok": 0,
+        "err": 84,
+        "errRate": 1,
+        "avg": 64835.24039166685,
+        "p95": 65395.887199999765
+      },
+      {
+        "t": 75,
+        "count": 132,
+        "rps": 132,
+        "ok": 0,
+        "err": 132,
+        "errRate": 1,
+        "avg": 65409.79669393952,
+        "p95": 66195.15809999965
+      },
+      {
+        "t": 76,
+        "count": 813,
+        "rps": 813,
+        "ok": 0,
+        "err": 813,
+        "errRate": 1,
+        "avg": 67092.84093382546,
+        "p95": 67473.03459999897
+      },
+      {
+        "t": 77,
+        "count": 703,
+        "rps": 703,
+        "ok": 0,
+        "err": 703,
+        "errRate": 1,
+        "avg": 67662.45342674242,
+        "p95": 68278.37509999983
+      },
+      {
+        "t": 78,
+        "count": 398,
+        "rps": 398,
+        "ok": 0,
+        "err": 398,
+        "errRate": 1,
+        "avg": 68383.0598494974,
+        "p95": 69217.95729999989
+      },
+      {
+        "t": 79,
+        "count": 120,
+        "rps": 120,
+        "ok": 0,
+        "err": 120,
+        "errRate": 1,
+        "avg": 69347.94212583343,
+        "p95": 70128.84750000015
+      },
+      {
+        "t": 80,
+        "count": 50,
+        "rps": 50,
+        "ok": 0,
+        "err": 50,
+        "errRate": 1,
+        "avg": 70571.18628199998,
+        "p95": 71089.69359999895
+      },
+      {
+        "t": 81,
+        "count": 9,
+        "rps": 9,
+        "ok": 0,
+        "err": 9,
+        "errRate": 1,
+        "avg": 71413.89490000035,
+        "p95": 71649.95720000006
+      },
+      {
+        "t": 82,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 83,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 84,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 85,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 86,
+        "count": 0,
+        "rps": 0,
+        "ok": 0,
+        "err": 0,
+        "errRate": 0,
+        "avg": 0,
+        "p95": 0
+      },
+      {
+        "t": 87,
+        "count": 82,
+        "rps": 82,
+        "ok": 0,
+        "err": 82,
+        "errRate": 1,
+        "avg": 77663.95801707318,
+        "p95": 77881.20189999975
+      }
+    ]
+  },
+  "steps": [],
+  "breakingPoint": null,
+  "abortReason": "auto-aborted: error rate reached 95.2% (abort threshold 50%) after 500 requests despite 0 IP rotation(s)",
+  "wallClockSec": 87.48,
+  "rotationCount": 0,
+  "blockedProxies": []
+}

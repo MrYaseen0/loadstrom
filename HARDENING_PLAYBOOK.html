@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Strom Fire Hardening & Capacity Playbook</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --fg: #e6edf3;
+    --muted: #8b949e;
+    --card: #161b22;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #f5b544;
+    --good: #3fb950;
+    --warn: #d29922;
+    --bad: #f85149;
+    --code-bg: #0d1117;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #ffffff;
+      --fg: #1f2328;
+      --muted: #656d76;
+      --card: #f6f8fa;
+      --border: #d0d7de;
+      --accent: #0969da;
+      --accent2: #9a6700;
+      --good: #1a7f37;
+      --warn: #9a6700;
+      --bad: #cf222e;
+      --code-bg: #f6f8fa;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font: 15px/1.7 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    color: var(--fg);
+    background: var(--bg);
+  }
+  h1, h2, h3, h4 { line-height: 1.3; color: var(--fg); }
+  h1 { font-size: 2.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.6rem; margin-top: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+  h3 { font-size: 1.2rem; margin-top: 1.8rem; }
+  h4 { font-size: 1rem; margin-top: 1.2rem; color: var(--muted); }
+  p { margin: 0.8rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: var(--code-bg); padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow: auto; margin: 1rem 0; }
+  pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+  th { background: var(--card); font-weight: 600; }
+  tr:nth-child(even) td { background: var(--card); }
+  ul, ol { padding-left: 1.5rem; margin: 0.8rem 0; }
+  li { margin: 0.4rem 0; }
+  .badge { display: inline-block; padding: 0.15em 0.5em; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+  .badge-ok { background: var(--good); color: #fff; }
+  .badge-warn { background: var(--warn); color: #fff; }
+  .badge-bad { background: var(--bad); color: #fff; }
+  .badge-info { background: var(--accent); color: #fff; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
+  .card h3 { margin-top: 0; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; margin: 1.5rem 0; }
+  .toc ul { list-style: none; padding-left: 0; margin: 0; }
+  .toc li { margin: 0.3rem 0; }
+  .toc a { color: var(--fg); }
+  .footnote { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 3rem; }
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li { display: flex; align-items: flex-start; gap: 0.5rem; margin: 0.5rem 0; }
+  .checklist input[type="checkbox"] { margin-top: 0.25rem; flex-shrink: 0; }
+  .phase-box { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1.5rem 0; }
+  .phase-box h3 { margin-top: 0; color: var(--accent); }
+  .version { color: var(--muted); font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 2rem; }
+  kbd { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; font-family: inherit; font-size: 0.9em; }
+</style>
+</head>
+<body>
+
+<h1>Strom Fire Hardening & Capacity Playbook <span class="badge badge-info">v1.0</span></h1>
+<p class="version">For Strom Fire self-hosted load tester · Generated 2026-09-15</p>
+
+<nav class="toc" aria-label="Table of contents">
+  <strong>Contents</strong>
+  <ul>
+    <li><a href="#philosophy">1. Philosophy</a></li>
+    <li><a href="#hardening-checklist">2. Hardening Checklist</a></li>
+    <li><a href="#methodology">3. Capacity Testing Methodology</a></li>
+    <li><a href="#target-hardening">4. Hardening the Target</a></li>
+    <li><a href="#multi-gen">5. Multiple Generators</a></li>
+    <li><a href="#ci">6. Secure CI/CD Integration</a></li>
+    <li><a href="#cli">7. Minimal CLI Wrapper</a></li>
+    <li><a href="#cheatsheet">8. Config Cheat Sheet</a></li>
+    <li><a href="#done">9. Definition of Done</a></li>
+    <li><a href="#disclaimer">10. Disclaimer</a></li>
+  </ul>
+</nav>
+
+<hr style="border:0;border-top:1px solid var(--border);margin:2rem 0">
+
+<section id="philosophy">
+<h2>1. Philosophy</h2>
+<table>
+<thead><tr><th>Principle</th><th>What it means for Strom Fire</th></tr></thead>
+<tbody>
+<tr><td>Safe by default</td><td>Demo target pre-filled; real targets require explicit <code>confirm=true</code> on every <code>/api/start</code>.</td></tr>
+<tr><td>Self-limiting</td><td>Auto-abort valve (<code>abortOnErrorRatePct</code>, default 10%; extreme backstop at 50% after 500 requests when auto-rotation is on) stops a run before it hammers a collapsing server.</td></tr>
+<tr><td>Bounded resources</td><td>Reservoir sampler caps memory; per-second timeline buckets cap chart data; agent <code>maxSockets</code> caps open connections.</td></tr>
+<tr><td>No secrets in code</td><td>Zero external deps, no telemetry, no config files with credentials.</td></tr>
+<tr><td>Audit trail</td><td>Every run emits a JSON report with config, verdict, metrics, timeline, and (if triggered) <code>abortReason</code>.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="hardening-checklist">
+<h2>2. Hardening Checklist</h2>
+
+<h3>2.1 Network / Host</h3>
+<ul class="checklist">
+<li><label><input type="checkbox"> <strong>Bind to localhost only</strong> — keep <code>HOST=127.0.0.1</code> (default). Never <code>0.0.0.0</code> unless behind a VPN/SSH tunnel.</label></li>
+<li><label><input type="checkbox"> <strong>Reverse proxy + TLS</strong> — if you expose the dashboard, put Nginx/Caddy in front with real certs, HTTP auth, and rate limiting.</label></li>
+<li><label><input type="checkbox"> <strong>Firewall</strong> — block inbound 8787 from the internet. Only allow your jump host / dev machine.</label></li>
+<li><label><input type="checkbox"> <strong>OS limits</strong> — raise file descriptors and ephemeral ports on the load generator box:</label></li>
+</ul>
+<pre><code># /etc/security/limits.d/loadstorm.conf
+* soft nofile 100000
+* hard nofile 100000
+# Linux kernel
+sysctl -w net.ipv4.ip_local_port_range="1024 65535"
+sysctl -w net.core.somaxconn=4096
+</code></pre>
+
+<h3>2.2 Application Hardening (<code>server.js</code>)</h3>
+<table>
+<thead><tr><th>Setting</th><th>Current Default</th><th>Recommended for "High & Secured"</th><th>Where to change</th></tr></thead>
+<tbody>
+<tr><td><code>MAX_BODY</code></td><td>1 MB</td><td>64 KB (API only accepts JSON)</td><td><code>server.js:13</code></td></tr>
+<tr><td><code>PORT</code></td><td>8787</td><td>Random high port + env var only</td><td><code>server.js:10</code></td></tr>
+<tr><td>Request timeout</td><td>none (Node default)</td><td>5 s hard timeout on <code>/api/*</code></td><td>add in <code>handleApi</code></td></tr>
+<tr><td>SSE heartbeat</td><td>1 s</td><td>2 s (less chatter)</td><td><code>server.js:85</code></td></tr>
+<tr><td>Demo endpoints</td><td>enabled</td><td>disable in prod (<code>DISABLE_DEMO=1</code>)</td><td>wrap <code>handleDemo</code></td></tr>
+<tr><td>CORS</td><td>none (same-origin)</td><td>keep none — dashboard is same-origin</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h4>Patch example (apply to <code>server.js</code>):</h4>
+<pre><code>// Top of file
+const MAX_BODY = 64 * 1024; // 64 KB
+const REQUEST_TIMEOUT_MS = 5000;
+
+// Inside handleApi, before await readBody(req):
+const ctrl = new AbortController();
+const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+req.on('close', () => clearTimeout(timer));
+// pass { signal: ctrl.signal } to readBody if you adapt it
+</code></pre>
+
+<h3>2.3 Engine Hardening (<code>engine.js</code>)</h3>
+<table>
+<thead><tr><th>Guard</th><th>Current</th><th>Hardened</th><th>File/Line</th></tr></thead>
+<tbody>
+<tr><td>Max concurrency</td><td>100,000</td><td>5,000 (per process)</td><td><code>engine.js:64</code></td></tr>
+<tr><td>Max RPS</td><td>5,000,000</td><td>200,000</td><td><code>engine.js:65</code></td></tr>
+<tr><td>Max stress step</td><td>100,000</td><td>2,000</td><td><code>engine.js:82</code></td></tr>
+<tr><td>Max stress max</td><td>100,000</td><td>2,000</td><td><code>engine.js:82</code></td></tr>
+<tr><td>Sample cap</td><td>200,000</td><td>100,000</td><td><code>engine.js:72</code></td></tr>
+<tr><td>Agent <code>maxSockets</code></td><td><code>concurrency + 16</code></td><td><code>Math.min(concurrency, 2000) + 16</code></td><td><code>engine.js:120</code></td></tr>
+<tr><td>Auto-abort default</td><td>50%</td><td><strong>10%</strong> (fail fast)</td><td><code>engine.js:73</code> / UI default</td></tr>
+<tr><td>TLS verify</td><td><code>true</code></td><td><strong>force <code>true</code></strong> (remove checkbox)</td><td><code>engine.js:69</code> + UI</td></tr>
+</tbody>
+</table>
+<p><strong>Why lower ceilings?</strong> A single Node process cannot sustainably drive >2k–5k concurrent sockets + high RPS without tuning the OS (§2.1). Keeping config ceilings realistic prevents "it let me type 50,000 but the box OOM'd" surprises.</p>
+
+<h3>2.4 Safety Gates (<code>safety.js</code>) — Do Not Weaken</h3>
+<ul>
+<li><code>KNOWN_PUBLIC_HOSTS</code> blocklist stays.</li>
+<li>Private IP / localhost allowlist stays.</li>
+<li><code>validateTarget</code> runs <strong>server-side</strong> on every <code>/api/start</code> — UI checkbox is UX only.</li>
+</ul>
+
+<h4>Optional: add your own allowlist</h4>
+<pre><code>// safety.js — add after KNOWN_PUBLIC_HOSTS
+const ALLOWED_HOSTS = new Set([
+  'staging.mycorp.com',
+  'api.dev.internal',
+  // CIDR not supported yet — add exact hosts or extend isPrivateIPv4
+]);
+function validateTarget(target) {
+  // ... existing code ...
+  if (!ALLOWED_HOSTS.has(host)) {
+    return { ok: false, level: 'block', reason: 'Host not in allowlist.' };
+  }
+  // ...
+}
+</code></pre>
+</section>
+
+<section id="methodology">
+<h2>3. Capacity Testing Methodology (the "Strom Fire Way")</h2>
+<p>Use this repeatable 3-phase loop <strong>against your own staging / pre-prod</strong> to find the real knee and then harden the target.</p>
+
+<div class="phase-box">
+<h3>Phase 0 — Baseline (5 min)</h3>
+<pre><code># 1. Smoke test — verify the tool + target work
+mode: load
+concurrency: 5
+durationSec: 30
+rps: 0
+thresholds: { maxErrorRatePct: 0.1, maxP95Ms: 500 }
+</code></pre>
+<p><strong>Pass gate:</strong> 0 errors, p95 < 200 ms. If not, fix the target first.</p>
+</div>
+
+<div class="phase-box">
+<h3>Phase 1 — Steady State (10–20 min)</h3>
+<pre><code>mode: load
+concurrency: 50           # start here
+durationSec: 300          # 5 min
+rampUpSec: 30
+thresholds: { maxErrorRatePct: 1, maxP95Ms: 1000 }
+</code></pre>
+<ul>
+<li>Increase <code>concurrency</code> in steps: 50 → 100 → 200 → 400…</li>
+<li>Stop when <strong>any</strong> threshold fails or auto-abort triggers.</li>
+<li>Record: <code>concurrency</code>, <code>rps</code>, <code>p95</code>, <code>err%</code>, CPU/RAM on target.</li>
+</ul>
+</div>
+
+<div class="phase-box">
+<h3>Phase 2 — Stress Ramp (15–30 min)</h3>
+<pre><code>mode: stress
+stress: { start: 20, step: 20, max: 500, stepDurationSec: 60 }
+thresholds: { maxErrorRatePct: 5, maxP95Ms: 2000 }
+</code></pre>
+<ul>
+<li>Strom Fire emits a <code>steps[]</code> array with verdict per step.</li>
+<li>The first <code>fail</code> step = <strong>breaking point</strong>.</li>
+<li>Your <strong>safe operating limit</strong> = 50–70% of breaking point concurrency.</li>
+</ul>
+</div>
+
+<div class="phase-box">
+<h3>Phase 3 — Soak (1–4 hrs, optional)</h3>
+<p>Run at <strong>safe operating limit</strong> for hours. Watch for:</p>
+<ul>
+<li>Memory leaks (rising RSS on target)</li>
+<li>GC pauses (latency spikes every N minutes)</li>
+<li>Connection pool exhaustion (sudden error bursts)</li>
+</ul>
+</div>
+</section>
+
+<section id="target-hardening">
+<h2>4. Hardening the Target (your app/server)</h2>
+<p>After you find the knee, apply these in order of ROI:</p>
+<table>
+<thead><tr><th>Layer</th><th>Action</th><th>Typical Gain</th></tr></thead>
+<tbody>
+<tr><td>CDN / Edge</td><td>Cache static assets, HTML (stale-while-revalidate), API GETs</td><td>10–100× RPS for cacheable traffic</td></tr>
+<tr><td>App Workers</td><td>Nginx <code>worker_processes auto</code>; Node <code>cluster</code> / PM2 <code>instances: max</code>; PHP-FPM <code>pm.max_children</code></td><td>2–8× (CPU-bound)</td></tr>
+<tr><td>DB Pool</td><td>Size = <code>workers × 2–3</code>; <code>statement_timeout</code>; <code>idle_in_transaction_session_timeout</code></td><td>Prevents 500s under load</td></tr>
+<tr><td>Timeouts</td><td>Upstream (LB → app) < App → DB < Client → LB</td><td>Prevents cascade hangs</td></tr>
+<tr><td>Rate Limiting</td><td>Per-IP / per-tenant at edge (429 with <code>Retry-After</code>)</td><td>Protects against abuse</td></tr>
+<tr><td>Compression</td><td>Brotli/Gzip on text responses</td><td>30–70% bandwidth ↓</td></tr>
+<tr><td>Keep-Alive</td><td><code>keepalive_timeout 65</code> (Nginx), <code>agent.keepAlive=true</code> (Strom Fire default)</td><td>20–40% latency ↓</td></tr>
+<tr><td>Observability</td><td>Prometheus metrics + structured logs + distributed tracing</td><td>MTTR ↓ 10×</td></tr>
+</tbody>
+</table>
+<p><strong>Re-test after each change</strong> using Phase 1 + 2. The knee should move right.</p>
+</section>
+
+<section id="multi-gen">
+<h2>5. Running Multiple Generators (Horizontal Scale)</h2>
+<p>One Strom Fire process ≈ 2k–5k concurrent users (depends on target latency). For higher load:</p>
+<pre><code># Generator 1
+PORT=8787 HOST=127.0.0.1 node server.js &
+
+# Generator 2 (different machine or container)
+PORT=8787 HOST=127.0.0.1 node server.js &
+
+# Coordinator script splits concurrency across generators
+# Each generator runs its own Stress mode with disjoint step ranges
+# Aggregate results manually (sum rps, weighted p95)
+</code></pre>
+<p><strong>Tip:</strong> Use the same <code>abortOnErrorRatePct</code> on all generators so they self-abort together.</p>
+</section>
+
+<section id="ci">
+<h2>6. Secure CI/CD Integration</h2>
+<pre><code># .github/workflows/load-test.yml
+name: Load Test Staging
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Staging URL'
+        required: true
+        default: 'https://staging.mycorp.com'
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: cd loadstorm && npm ci --omit=dev
+      - name: Run steady load
+        env:
+          TARGET: ${{ inputs.target }}
+          CONFIRM: 'true'
+        run: |
+          cd loadstorm
+          node scripts/apitest.js \
+            --url "$TARGET" \
+            --mode load \
+            --concurrency 200 \
+            --duration 300 \
+            --confirm
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: loadstorm-report
+          path: loadstorm/report-*.json
+</code></pre>
+<p><strong>Requirements for CI:</strong></p>
+<ul>
+<li>Staging must be a dedicated, disposable environment.</li>
+<li>Runner must have network access to staging (VPC peering / VPN).</li>
+<li><code>scripts/apitest.js</code> needs a tiny CLI wrapper (see below).</li>
+</ul>
+</section>
+
+<section id="cli">
+<h2>7. Minimal CLI Wrapper (add to <code>scripts/apitest.js</code>)</h2>
+<pre><code>#!/usr/bin/env node
+'use strict';
+// scripts/apitest.js — integration test for Strom Fire API
+// This script boots its own server and tests against the built-in demo target.
+// For user-facing CLI, use: node anon-launcher.js "https://target.com" 50 0
+
+const http = require('http');
+const { URL } = require('url');
+
+const args = Object.fromEntries(
+  process.argv.slice(2).reduce((a, v, i, arr) => {
+    if (v.startsWith('--')) a.push([v.slice(2), arr[i + 1]]);
+    return a;
+  }, [])
+);
+
+const base = new URL('http://127.0.0.1:8787');
+async function post(path, body) {
+  return new Promise((resolve, reject) => {
+    const req = http.request(
+      { ...base, path, method: 'POST', headers: { 'content-type': 'application/json' } },
+      (res) => {
+        let d = ''; res.on('data', c => d += c); res.on('end', () => resolve({ status: res.statusCode, body: JSON.parse(d) }));
+      }
+    );
+    req.on('error', reject);
+    req.write(JSON.stringify(body));
+    req.end();
+  });
+}
+
+async function main() {
+  const cfg = {
+    url: args.url,
+    mode: args.mode || 'load',
+    concurrency: Number(args.concurrency) || 50,
+    durationSec: Number(args.duration) || 60,
+    confirm: args.confirm === 'true',
+  };
+  if (!cfg.url || !cfg.confirm) {
+    console.error('Usage: --url <URL> --confirm true [--mode load|stress] [--concurrency N] [--duration S]');
+    process.exit(2);
+  }
+  const start = await post('/api/start', cfg);
+  if (!start.body.ok) throw new Error(start.body.error);
+  console.log('Started:', start.body);
+  // Poll /api/status until finished
+  while (true) {
+    await new Promise(r => setTimeout(r, 2000));
+    const st = await post('/api/status', {});
+    console.log('State:', st.body.engineState, 'rps:', st.body.rps?.toFixed(1));
+    if (st.body.engineState === 'finished' || st.body.engineState === 'error') break;
+  }
+  const rep = await post('/api/report', {});
+  const fs = require('fs');
+  const fname = `report-${Date.now()}.json`;
+  fs.writeFileSync(fname, JSON.stringify(rep.body.report, null, 2));
+  console.log('Report saved to', fname);
+  process.exit(rep.body.report?.result?.status === 'pass' ? 0 : 1);
+}
+main().catch(e => { console.error(e); process.exit(1); });
+</code></pre>
+<p>Make it executable: <code>chmod +x scripts/apitest.js</code></p>
+</section>
+
+<section id="cheatsheet">
+<h2>8. Quick Reference — Config Cheat Sheet</h2>
+<table>
+<thead><tr><th>Parameter</th><th>Load Mode</th><th>Stress Mode</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>concurrency</code></td><td>50–500</td><td>(ignored)</td><td>Virtual users</td></tr>
+<tr><td><code>rps</code></td><td>0 = unlimited</td><td>(ignored)</td><td>Token bucket pacing</td></tr>
+<tr><td><code>durationSec</code></td><td>60–300</td><td>(ignored)</td><td>Steady phase length</td></tr>
+<tr><td><code>rampUpSec</code></td><td>10–60</td><td>0</td><td>Spread start</td></tr>
+<tr><td><code>stress.start</code></td><td>—</td><td>10–50</td><td>First step</td></tr>
+<tr><td><code>stress.step</code></td><td>—</td><td>10–50</td><td>Increment</td></tr>
+<tr><td><code>stress.max</code></td><td>—</td><td>200–2000</td><td>Ceiling</td></tr>
+<tr><td><code>stress.stepDurationSec</code></td><td>—</td><td>30–120</td><td>Time per step</td></tr>
+<tr><td><code>abortOnErrorRatePct</code></td><td><strong>10</strong></td><td><strong>10</strong></td><td>Safety valve</td></tr>
+<tr><td><code>thresholds.maxErrorRatePct</code></td><td>1</td><td>5</td><td>Fail criteria</td></tr>
+<tr><td><code>thresholds.maxP95Ms</code></td><td>1000</td><td>2000</td><td>Fail criteria</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="done">
+<h2>9. What "Done" Looks Like</h2>
+<ul class="checklist">
+<li><label><input type="checkbox"> Strom Fire instance binds to <code>127.0.0.1</code>, behind auth + TLS if exposed.</label></li>
+<li><label><input type="checkbox"> OS limits raised on generator box (<code>ulimit -n</code>, <code>ip_local_port_range</code>).</label></li>
+<li><label><input type="checkbox"> Config ceilings lowered in <code>engine.js</code> (concurrency ≤ 5k, RPS ≤ 200k).</label></li>
+<li><label><input type="checkbox"> Auto-abort default = 10% (UI + engine).</label></li>
+<li><label><input type="checkbox"> Allowlist added in <code>safety.js</code> for your domains only.</label></li>
+<li><label><input type="checkbox"> Phase 0 → 1 → 2 run cleanly against staging; breaking point identified.</label></li>
+<li><label><input type="checkbox"> Target hardened (workers, pools, timeouts, cache, rate limits); knee moves right.</label></li>
+<li><label><input type="checkbox"> CI job runs steady + stress on every release candidate; gate on <code>pass</code>.</label></li>
+<li><label><input type="checkbox"> Report artifacts archived; <code>abortReason</code> logged for post-mortems.</label></li>
+</ul>
+</section>
+
+<section id="disclaimer">
+<h2>10. Disclaimer</h2>
+<div class="card" style="border-color: var(--warn);">
+<p><strong>Strom Fire is a tool for testing systems you own or are explicitly authorised to test.</strong></p>
+<p>This playbook does not authorise testing any third-party system.<br>
+Unauthorised load testing can violate laws (CFAA, GDPR, etc.) and terms of service.<br>
+The auto-abort valve, blocklist, and confirmation gate are guardrails — <strong>they are not a substitute for your own judgement or written permission.</strong></p>
+</div>
+</section>
+
+<p class="footnote">Generated for Strom Fire v1.0.0 — copy, adapt, and keep with your runbooks.</p>
+
+</body>
+</html>

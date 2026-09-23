@@ -1,0 +1,143 @@
+{
+  "generatedAt": "2026-09-16T17:39:56.214Z",
+  "state": "finished",
+  "error": null,
+  "config": {
+    "url": "http://127.0.0.1:8787/",
+    "host": "127.0.0.1:8787",
+    "method": "GET",
+    "mode": "load",
+    "concurrency": 2,
+    "rps": 0,
+    "durationSec": 3,
+    "rampUpSec": 1,
+    "timeoutMs": 5000,
+    "httpVersion": "1.1",
+    "trackPhases": true,
+    "pacing": "standard",
+    "thresholds": {
+      "maxErrorRatePct": 100,
+      "maxP95Ms": 10000,
+      "minRps": 0
+    },
+    "stress": {
+      "start": 50,
+      "step": 50,
+      "max": 500,
+      "stepDurationSec": 30
+    },
+    "headers": [
+      "user-agent",
+      "accept",
+      "accept-language",
+      "accept-encoding",
+      "upgrade-insecure-requests",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "sec-fetch-user"
+    ],
+    "hasBody": false,
+    "autoRotate": false,
+    "torControlPort": 9151,
+    "blockThresholdPct": 70
+  },
+  "result": {
+    "status": "pass",
+    "headline": "Handled it: 1,290 successful requests (of 1,290 completed) at 428 rps, p95 11 ms, error rate 0.00%.",
+    "reasons": [],
+    "recommendations": [
+      "This load was handled cleanly. Push higher: increase concurrency in Stress mode to find where it starts to bend, then provision ~2x that headroom.",
+      "Latency percentiles are estimated from a reservoir sample of 1,290 requests (exact count/avg/min/max)."
+    ]
+  },
+  "metrics": {
+    "elapsedSec": 3.02,
+    "attempted": 1290,
+    "completed": 1290,
+    "ok": 1290,
+    "failed": 0,
+    "timeouts": 0,
+    "connErrors": 0,
+    "bytes": 22060290,
+    "rps": 427.7188328912467,
+    "attemptedRps": 427.7188328912467,
+    "errRate": 0,
+    "latency": {
+      "min": 0.9704000018537045,
+      "max": 140.9273000024259,
+      "avg": 4.025146046523438,
+      "p50": 2.4323999993503094,
+      "p90": 5.803399998694658,
+      "p95": 10.86650000140071,
+      "p99": 38.36329999938607,
+      "dns_p50": 0,
+      "dns_p95": 0,
+      "dns_p99": 0,
+      "tcp_p50": 2.1042000018060207,
+      "tcp_p95": 8.789000000804663,
+      "tcp_p99": 37.86189999803901,
+      "tls_p50": 0,
+      "tls_p95": 0,
+      "tls_p99": 0,
+      "ttfb_p50": 0.12620000168681145,
+      "ttfb_p95": 0.23200000077486038,
+      "ttfb_p99": 0.9879999980330467,
+      "download_p50": 0.1924000009894371,
+      "download_p95": 0.4195000007748604,
+      "download_p99": 2.1229999996721745
+    },
+    "statusCounts": {
+      "200": 1290
+    },
+    "sampleSize": 1290,
+    "timeline": [
+      {
+        "t": 0,
+        "count": 494,
+        "rps": 494,
+        "ok": 494,
+        "err": 0,
+        "errRate": 0,
+        "avg": 2.82387874500924,
+        "p95": 11.303899999707937
+      },
+      {
+        "t": 1,
+        "count": 567,
+        "rps": 567,
+        "ok": 567,
+        "err": 0,
+        "errRate": 0,
+        "avg": 3.3914282186518587,
+        "p95": 4.474599998444319
+      },
+      {
+        "t": 2,
+        "count": 227,
+        "rps": 227,
+        "ok": 227,
+        "err": 0,
+        "errRate": 0,
+        "avg": 8.09910660796688,
+        "p95": 38.14579999819398
+      },
+      {
+        "t": 3,
+        "count": 2,
+        "rps": 2,
+        "ok": 2,
+        "err": 0,
+        "errRate": 0,
+        "avg": 18.002649998292327,
+        "p95": 19.120099999010563
+      }
+    ]
+  },
+  "steps": [],
+  "breakingPoint": null,
+  "abortReason": null,
+  "wallClockSec": 3.01,
+  "rotationCount": 0,
+  "blockedProxies": []
+}

@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Strom Fire — self-hosted load testing</title>
+<link rel="icon" href="/logo.png">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><img id="brandLogo" src="/logo.png" alt="Strom Fire" style="height:30px;max-width:150px;object-fit:contain" onerror="this.remove()"> Strom Fire <span class="tag">self-hosted load tester</span></div>
+  <div class="top-actions">
+    <button id="demoBtn" class="btn ghost" type="button">Use demo target</button>
+    <button id="stopBtnTop" class="btn danger topstop" type="button">■ Stop</button>
+    <button id="logoutBtn" class="btn ghost" type="button" title="Sign out">Sign out</button>
+    <span id="connPill" class="pill" aria-live="polite"><span class="dot"></span> connecting…</span>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ============ CONFIG ============ -->
+  <section class="card config" aria-label="Test configuration">
+    <h2>1 · Target</h2>
+    <label class="field">
+      <span>URL or IP address</span>
+      <input id="url" type="text" placeholder="https://your-site.com  or  http://192.168.1.20:8080" autocomplete="off" spellcheck="false">
+    </label>
+    <div id="urlHint" class="hint">Paste the address of a site or server <strong>you own</strong>. http and https are supported.</div>
+
+    <div class="row">
+      <label class="field"><span>Method</span>
+        <select id="method">
+          <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option><option>HEAD</option>
+        </select>
+      </label>
+      <label class="field"><span>Timeout (ms)</span>
+        <input id="timeoutMs" type="number" min="100" step="100" value="10000">
+      </label>
+    </div>
+
+    <h2>2 · Load profile</h2>
+    <div class="seg" role="tablist" aria-label="Load mode">
+      <button class="seg-btn active" data-mode="load" role="tab" aria-selected="true" type="button">Steady load</button>
+      <button class="seg-btn" data-mode="stress" role="tab" aria-selected="false" type="button">Stress / ramp</button>
+    </div>
+
+    <div id="loadFields">
+      <div class="row">
+        <label class="field"><span>Concurrent users</span>
+          <input id="concurrency" type="number" min="1" max="10000" step="1" value="100">
+        </label>
+        <label class="field"><span>Target rate (rps)</span>
+          <input id="rps" type="number" min="0" step="10" value="0">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field"><span>Duration (s)</span>
+          <input id="durationSec" type="number" min="0" max="7200" step="1" value="0" title="0 = unlimited (runs until you click Stop)">
+        </label>
+        <label class="field"><span>Ramp-up (s)</span>
+          <input id="rampUpSec" type="number" min="0" step="1" value="5">
+        </label>
+      </div>
+      <div class="hint">Concurrent users = how many virtual users hit the site at once. Target rate 0 = go as fast as those users can. Duration 0 = unlimited (runs until you click Stop). Capped at 10,000 per run — one machine can't usefully drive more (ports/sockets run out); scale with Stress mode or extra generators.</div>
+    </div>
+
+    <div id="stressFields" hidden>
+      <div class="row-3">
+        <label class="field"><span>Start users</span><input id="stStart" type="number" min="1" step="5" value="20"></label>
+        <label class="field"><span>Step</span><input id="stStep" type="number" min="1" step="5" value="20"></label>
+        <label class="field"><span>Max users</span><input id="stMax" type="number" min="1" step="5" value="200"></label>
+      </div>
+      <label class="field"><span>Seconds per step</span><input id="stDur" type="number" min="1" step="1" value="15"></label>
+      <div class="hint">Stress mode climbs user count step by step until the site fails your rules — that level is your breaking point.</div>
+    </div>
+
+    <h2>3 · Pass / fail rules</h2>
+    <div class="row-3">
+      <label class="field"><span>Max error %</span><input id="maxErr" type="number" min="0" max="100" step="0.1" value="1"></label>
+      <label class="field"><span>Max p95 (ms)</span><input id="maxP95" type="number" min="1" step="50" value="1000"></label>
+      <label class="field"><span>Min rps</span><input id="minRps" type="number" min="0" step="10" value="0"></label>
+    </div>
+
+    <details class="adv">
+      <summary>Advanced · headers, body, TLS, redirects, HTTP/2, precision</summary>
+      <label class="field"><span>Request headers (JSON)</span>
+        <textarea id="headers" placeholder='{"Authorization":"Bearer …","X-Team":"qa"}' spellcheck="false"></textarea>
+      </label>
+      <label class="field"><span>Request body (for POST/PUT/PATCH)</span>
+        <textarea id="body" placeholder='{"hello":"world"}' spellcheck="false"></textarea>
+      </label>
+      <div class="row">
+        <label class="field"><span>HTTP version</span>
+          <select id="httpVersion">
+            <option value="1.1">HTTP/1.1 (default, broad compatibility)</option>
+            <option value="2">HTTP/2 (HTTPS only, multiplexed, lower latency)</option>
+          </select>
+        </label>
+        <label class="field"><span>Pacing mode</span>
+          <select id="pacing">
+            <option value="standard">Standard (ms precision)</option>
+            <option value="precise">Precise (sub-ms, busy-wait)</option>
+          </select>
+        </label>
+      </div>
+      <div class="check"><input type="checkbox" id="trackPhases" checked><label for="trackPhases">Track connection phases (DNS, TCP, TLS, TTFB, download)</label></div>
+      <div class="check"><input type="checkbox" id="tlsVerify" checked><label for="tlsVerify">Verify TLS certificates (uncheck only for self-signed test servers)</label></div>
+      <div class="check"><input type="checkbox" id="followRedirects" checked><label for="followRedirects">Follow redirects</label></div>
+      <label class="field"><span>Max redirects</span>
+        <input id="maxRedirects" type="number" min="0" max="10" step="1" value="5">
+      </label>
+      <div class="hint">Set max redirects to 0 to disable redirect following.</div>
+      <label class="field"><span>Auto-abort error % (safety valve)</span>
+        <input id="abortErr" type="number" min="0" max="100" step="5" value="10">
+      </label>
+      <div class="hint">If the error rate blows past this level, Strom Fire stops the test by itself instead of hammering a failing server. 0 disables the valve.</div>
+      <div class="hint">HTTP/2 requires HTTPS target. Precise pacing uses busy-wait for sub-millisecond accuracy (higher CPU). Phase tracking adds per-request DNS/TCP/TLS/TTFB breakdown.</div>
+    </details>
+
+    <details class="adv" open>
+      <summary>Anonymity & Proxy · hide identity, rotate fingerprints</summary>
+      <label class="field"><span>Proxy URL</span>
+        <input id="proxy" type="text" placeholder="http://user:pass@host:port  or  socks5://host:port" spellcheck="false">
+      </label>
+      <div class="proxy-test-row">
+        <button id="testProxyBtn" class="btn tiny" type="button">Test Connection</button>
+        <button id="detectTorBtn" class="btn tiny" type="button" title="Find local Tor and fill proxy + control port">Detect Tor</button>
+        <span id="proxyStatus" class="proxy-status"></span>
+      </div>
+      <label class="field"><span>Proxy List (one per line, for rotation)</span>
+        <textarea id="proxyList" placeholder="socks5://127.0.0.1:9050
+http://user:pass@proxy1.example.com:8080
+socks5://proxy2.example.com:1080" spellcheck="false" rows="4"></textarea>
+      </label>
+      <div class="hint">HTTP/HTTPS proxy (CONNECT) or SOCKS5. For Tor: <code>socks5://127.0.0.1:9050</code>. Leave empty for direct connection. List enables round-robin rotation per virtual user.</div>
+      <div class="row">
+        <label class="field"><span>Header profile</span>
+          <select id="headerProfile">
+            <option value="desktop-chrome">Desktop Chrome (Windows)</option>
+            <option value="desktop-firefox">Desktop Firefox (Windows)</option>
+            <option value="desktop-safari">Desktop Safari (macOS)</option>
+            <option value="mobile-chrome">Mobile Chrome (Android)</option>
+            <option value="api-client">API Client (minimal)</option>
+            <option value="minimal">Minimal (Strom Fire default)</option>
+          </select>
+        </label>
+        <label class="field"><span>Request jitter (ms)</span>
+          <input id="requestJitterMs" type="number" min="0" max="5000" step="10" value="0">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field"><span>TLS fingerprint</span>
+          <select id="tlsFingerprint">
+            <option value="chrome120">Chrome 120 (default)</option>
+            <option value="firefox121">Firefox 121</option>
+            <option value="safari17">Safari 17</option>
+            <option value="ios17">iOS 17 Safari</option>
+          </select>
+        </label>
+      </div>
+      <div class="check"><input type="checkbox" id="rotateHeaders" checked><label for="rotateHeaders">Rotate headers per request (randomize Accept-Language, etc.)</label></div>
+      <div class="check"><input type="checkbox" id="isolateCookies" checked><label for="isolateCookies">Isolate cookies per virtual user (separate cookie jar)</label></div>
+      <div class="check"><input type="checkbox" id="simulateUserSession"><label for="simulateUserSession">Simulate user session (think time 0.5-3.5s between requests — lowers RPS, opt-in)</label></div>
+      <div class="check"><input type="checkbox" id="requestOrderRandomization" checked><label for="requestOrderRandomization">Randomize header order (anti-fingerprinting)</label></div>
+      <div class="check"><input type="checkbox" id="reuseConnections" checked><label for="reuseConnections">Reuse connections (HTTP keep-alive, like real browsers)</label></div>
+      <div class="check"><input type="checkbox" id="autoRotate"><label for="autoRotate">Auto-rotate IP when blocked (needs proxy; auto-abort stays on as extreme backstop)</label></div>
+      <div id="rotateWarn" class="hint warn" hidden>Auto-rotate is on but no proxy is set — rotation only acts with a Proxy URL or Proxy List; otherwise it does nothing.</div>
+      <div class="row">
+        <label class="field"><span>Tor control port</span>
+          <input id="torControlPort" type="number" min="1024" max="65535" value="9151">
+        </label>
+        <label class="field"><span>Block threshold (%)</span>
+          <input id="blockThresholdPct" type="number" min="10" max="100" value="70">
+        </label>
+      </div>
+      <div class="hint">Proxy hides your real IP. Header profiles mimic real browsers. Cookie isolation = each virtual user has own session. Session simulation = realistic think time. Jitter = random delay per request. Proxy list = round-robin IP rotation. Combine with Tor for full anonymity.</div>
+      <div class="hint"><strong>Auto-rotate:</strong> When blocked (high timeout rate), Strom Fire automatically switches to a new Tor circuit or next proxy in list. Tor control port defaults to 9151 (Tor Browser). Block threshold = % of errors that triggers rotation.</div>
+    </details>
+
+    <details class="adv">
+      <summary>Presets · quick config</summary>
+      <div class="preset-row">
+        <button class="btn tiny preset-btn" data-preset="gentle">Gentle</button>
+        <button class="btn tiny preset-btn" data-preset="normal">Normal</button>
+        <button class="btn tiny preset-btn" data-preset="aggressive">Aggressive</button>
+        <button class="btn tiny preset-btn" data-preset="stress">Stress</button>
+      </div>
+      <div class="hint">Gentle = 10 users, safe thresholds. Normal = 50 users. Aggressive = 200 users, tight timeouts. Stress = ramp mode, find breaking point.</div>
+    </details>
+
+    <div class="check auth">
+      <input type="checkbox" id="confirm">
+      <label for="confirm"><strong>I own this target</strong> or have explicit written permission to load-test it. I understand unauthorised load testing can be illegal and harmful.</label>
+    </div>
+
+    <div class="actions">
+      <button id="startBtn" class="btn primary" type="button">▶ Start test</button>
+      <button id="stopBtn" class="btn danger" type="button" disabled>■ Stop</button>
+      <button id="resetBtn" class="btn ghost" type="button" title="Clear the previous result">Reset</button>
+    </div>
+    <div id="configError" class="error" role="alert" hidden></div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section class="results" aria-label="Test results">
+    <div id="verdict" class="verdict idle" role="status" aria-live="polite">
+      <div class="v-headline"><span class="v-badge">Ready</span>Ready when you are</div>
+      <div class="v-sub">Paste a URL, pick a load profile, tick the authorisation box, and press Start.</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="k-label">Throughput</div><div class="k-value" id="kRps">0 <small>rps</small></div></div>
+      <div class="kpi"><div class="k-label">Active users</div><div class="k-value" id="kUsers">0</div></div>
+      <div class="kpi"><div class="k-label">Avg latency</div><div class="k-value" id="kAvg">0 <small>ms</small></div></div>
+      <div class="kpi"><div class="k-label">p95 latency</div><div class="k-value" id="kP95">0 <small>ms</small></div></div>
+      <div class="kpi"><div class="k-label">p99 latency</div><div class="k-value" id="kP99">0 <small>ms</small></div></div>
+      <div class="kpi" id="kpiErrCard"><div class="k-label">Error rate</div><div class="k-value" id="kErr">0 <small>%</small></div></div>
+      <div class="kpi"><div class="k-label">Requests</div><div class="k-value" id="kReq">0</div></div>
+      <div class="kpi"><div class="k-label">Data received</div><div class="k-value" id="kBytes">0 <small>B</small></div></div>
+    </div>
+
+    <div class="charts">
+      <figure>
+        <figcaption>Throughput &amp; errors
+          <span class="legend"><span><i style="background:#4c8dff"></i>rps</span><span><i style="background:#ff5d6c"></i>error %</span></span>
+        </figcaption>
+        <canvas id="chartRps" aria-label="Requests per second and error rate over time"></canvas>
+      </figure>
+      <figure>
+        <figcaption>Latency
+          <span class="legend"><span><i style="background:#22d3a6"></i>avg ms</span><span><i style="background:#f5b544"></i>p95 ms</span></span>
+        </figcaption>
+        <canvas id="chartLat" aria-label="Average and p95 latency over time"></canvas>
+      </figure>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Response status codes</h3>
+        <table class="status" id="statusTable">
+          <thead><tr><th>Status</th><th class="num">Count</th><th class="num">Share</th></tr></thead>
+          <tbody><tr><td colspan="3" class="empty">No traffic yet.</td></tr></tbody>
+        </table>
+        <div id="stepsWrap" hidden>
+          <h3 style="margin-top:16px">Stress steps</h3>
+          <table class="status" id="stepsTable">
+            <thead><tr><th>Users</th><th class="num">rps</th><th class="num">p95</th><th class="num">err %</th><th>Verdict</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Rotation log <span class="kpi" style="display:inline;margin-left:8px;padding:2px 8px;font-size:12px" id="kRotations">0 rotations</span></h3>
+        <div class="log" id="rotationLog" role="log" aria-live="polite">
+          <div class="log-empty">No rotations yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Live log</h3>
+      <div class="log" id="log" role="log" aria-live="polite"></div>
+    </div>
+
+    <div class="card" id="historyCard">
+      <h3>Test history</h3>
+      <div id="historyList" class="history-list"></div>
+    </div>
+
+    <div class="card" id="reportCard" hidden>
+      <div class="report-head">
+        <h3 style="margin:0">Result report</h3>
+        <div class="actions" style="flex:0 0 auto">
+          <button id="exportJson" class="btn tiny" type="button">⤓ Export JSON</button>
+          <button id="exportCsv" class="btn tiny" type="button">⤓ Export CSV</button>
+          <button id="copyReport" class="btn tiny" type="button">⧉ Copy summary</button>
+          <button id="printReport" class="btn tiny" type="button">🖨 Print / PDF</button>
+        </div>
+      </div>
+      <div id="reportSummary" class="v-sub" style="margin:10px 0"></div>
+      <pre id="reportJson"></pre>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Strom Fire runs entirely on your machine — no cloud, no cost. Only test systems you own or are authorised to test.
+</footer>
+
+<script src="/format.js"></script>
+<script src="/charts.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

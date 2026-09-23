@@ -1,0 +1,166 @@
+{
+  "generatedAt": "2026-09-16T17:39:38.035Z",
+  "state": "finished",
+  "error": null,
+  "config": {
+    "url": "http://127.0.0.1:8787/",
+    "host": "127.0.0.1:8787",
+    "method": "GET",
+    "mode": "load",
+    "concurrency": 3,
+    "rps": 0,
+    "durationSec": 5,
+    "rampUpSec": 1,
+    "timeoutMs": 5000,
+    "httpVersion": "1.1",
+    "trackPhases": true,
+    "pacing": "standard",
+    "thresholds": {
+      "maxErrorRatePct": 100,
+      "maxP95Ms": 10000,
+      "minRps": 0
+    },
+    "stress": {
+      "start": 50,
+      "step": 50,
+      "max": 500,
+      "stepDurationSec": 30
+    },
+    "headers": [
+      "user-agent",
+      "accept",
+      "accept-language",
+      "accept-encoding",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "sec-fetch-user",
+      "upgrade-insecure-requests"
+    ],
+    "hasBody": false,
+    "autoRotate": false,
+    "torControlPort": 9151,
+    "blockThresholdPct": 70
+  },
+  "result": {
+    "status": "pass",
+    "headline": "Handled it: 6,646 successful requests (of 6,646 completed) at 1328 rps, p95 3 ms, error rate 0.00%.",
+    "reasons": [],
+    "recommendations": [
+      "This load was handled cleanly. Push higher: increase concurrency in Stress mode to find where it starts to bend, then provision ~2x that headroom.",
+      "Latency percentiles are estimated from a reservoir sample of 6,646 requests (exact count/avg/min/max)."
+    ]
+  },
+  "metrics": {
+    "elapsedSec": 5,
+    "attempted": 6646,
+    "completed": 6646,
+    "ok": 6646,
+    "failed": 0,
+    "timeouts": 0,
+    "connErrors": 0,
+    "bytes": 113653246,
+    "rps": 1328.1374900079936,
+    "attemptedRps": 1328.1374900079936,
+    "errRate": 0,
+    "latency": {
+      "min": 0.9679000005126,
+      "max": 26.05969999730587,
+      "avg": 2.0446072674933466,
+      "p50": 1.9199000000953674,
+      "p90": 2.3006999976933002,
+      "p95": 2.5658999979496,
+      "p99": 6.787599999457598,
+      "dns_p50": 0,
+      "dns_p95": 0,
+      "dns_p99": 0,
+      "tcp_p50": 1.7507000006735325,
+      "tcp_p95": 2.3458000011742115,
+      "tcp_p99": 6.410500001162291,
+      "tls_p50": 0,
+      "tls_p95": 0,
+      "tls_p99": 0,
+      "ttfb_p50": 0.06279999762773514,
+      "ttfb_p95": 0.09239999949932098,
+      "ttfb_p99": 0.12619999796152115,
+      "download_p50": 0.10370000079274178,
+      "download_p95": 0.15040000155568123,
+      "download_p99": 0.20110000297427177
+    },
+    "statusCounts": {
+      "200": 6646
+    },
+    "sampleSize": 6646,
+    "timeline": [
+      {
+        "t": 0,
+        "count": 1095,
+        "rps": 1095,
+        "ok": 1095,
+        "err": 0,
+        "errRate": 0,
+        "avg": 1.7438596346913136,
+        "p95": 2.3273999989032745
+      },
+      {
+        "t": 1,
+        "count": 1416,
+        "rps": 1416,
+        "ok": 1416,
+        "err": 0,
+        "errRate": 0,
+        "avg": 2.059143926532634,
+        "p95": 2.5369000025093555
+      },
+      {
+        "t": 2,
+        "count": 1393,
+        "rps": 1393,
+        "ok": 1393,
+        "err": 0,
+        "errRate": 0,
+        "avg": 2.0904515433952224,
+        "p95": 2.3705000020563602
+      },
+      {
+        "t": 3,
+        "count": 1377,
+        "rps": 1377,
+        "ok": 1377,
+        "err": 0,
+        "errRate": 0,
+        "avg": 2.1084055192254554,
+        "p95": 2.4778000004589558
+      },
+      {
+        "t": 4,
+        "count": 1358,
+        "rps": 1358,
+        "ok": 1358,
+        "err": 0,
+        "errRate": 0,
+        "avg": 2.1617488217113516,
+        "p95": 2.3316999971866608
+      },
+      {
+        "t": 5,
+        "count": 7,
+        "rps": 7,
+        "ok": 7,
+        "err": 0,
+        "errRate": 0,
+        "avg": 1.751071428081819,
+        "p95": 1.905000001192093
+      }
+    ]
+  },
+  "steps": [],
+  "breakingPoint": null,
+  "abortReason": null,
+  "wallClockSec": 5,
+  "rotationCount": 0,
+  "blockedProxies": []
+}

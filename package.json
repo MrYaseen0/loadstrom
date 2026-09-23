@@ -1,0 +1,25 @@
+{
+  "name": "stromfire",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Strom Fire - a self-hosted, zero-cost, zero-dependency load-testing dashboard. Paste a URL/IP you own, run a high-concurrency test, and see whether your site handles it.",
+  "main": "server.js",
+  "bin": {
+    "stromfire": "server.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "selftest": "node scripts/selftest.js",
+    "apitest": "node scripts/apitest.js",
+    "e2e": "node scripts/e2e-test.js",
+    "authtest": "node scripts/authtest.js",
+    "test": "node scripts/selftest.js && node scripts/apitest.js",
+    "test:all": "node scripts/selftest.js && node scripts/apitest.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "license": "MIT"
+}

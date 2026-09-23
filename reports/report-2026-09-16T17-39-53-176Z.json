@@ -1,0 +1,206 @@
+{
+  "generatedAt": "2026-09-16T17:39:53.175Z",
+  "state": "finished",
+  "error": null,
+  "config": {
+    "url": "http://127.0.0.1:8787/",
+    "host": "127.0.0.1:8787",
+    "method": "GET",
+    "mode": "load",
+    "concurrency": 5,
+    "rps": 100,
+    "durationSec": 10,
+    "rampUpSec": 2,
+    "timeoutMs": 5000,
+    "httpVersion": "1.1",
+    "trackPhases": true,
+    "pacing": "standard",
+    "thresholds": {
+      "maxErrorRatePct": 100,
+      "maxP95Ms": 10000,
+      "minRps": 0
+    },
+    "stress": {
+      "start": 50,
+      "step": 50,
+      "max": 500,
+      "stepDurationSec": 30
+    },
+    "headers": [
+      "user-agent",
+      "accept",
+      "accept-language",
+      "accept-encoding",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "sec-fetch-user",
+      "upgrade-insecure-requests"
+    ],
+    "hasBody": false,
+    "autoRotate": false,
+    "torControlPort": 9151,
+    "blockThresholdPct": 70
+  },
+  "result": {
+    "status": "pass",
+    "headline": "Handled it: 965 successful requests (of 965 completed) at 96 rps, p95 17 ms, error rate 0.00%.",
+    "reasons": [],
+    "recommendations": [
+      "This load was handled cleanly. Push higher: increase concurrency in Stress mode to find where it starts to bend, then provision ~2x that headroom.",
+      "Latency percentiles are estimated from a reservoir sample of 965 requests (exact count/avg/min/max)."
+    ]
+  },
+  "metrics": {
+    "elapsedSec": 10.05,
+    "attempted": 965,
+    "completed": 965,
+    "ok": 965,
+    "failed": 0,
+    "timeouts": 0,
+    "connErrors": 0,
+    "bytes": 16502465,
+    "rps": 95.97215315763302,
+    "attemptedRps": 95.97215315763302,
+    "errRate": 0,
+    "latency": {
+      "min": 1.1757999993860722,
+      "max": 103.53860000148416,
+      "avg": 5.349458238358943,
+      "p50": 3.220499999821186,
+      "p90": 9.567300003021955,
+      "p95": 17.219999998807907,
+      "p99": 51.408999998122454,
+      "dns_p50": 0,
+      "dns_p95": 0,
+      "dns_p99": 0,
+      "tcp_p50": 2.582600001245737,
+      "tcp_p95": 16.424999997019768,
+      "tcp_p99": 51.13419999927282,
+      "tls_p50": 0,
+      "tls_p95": 0,
+      "tls_p99": 0,
+      "ttfb_p50": 0.15650000050663948,
+      "ttfb_p95": 0.28999999910593033,
+      "ttfb_p99": 1.0953999981284142,
+      "download_p50": 0.3085000030696392,
+      "download_p95": 0.8799000009894371,
+      "download_p99": 3.946399997919798
+    },
+    "statusCounts": {
+      "200": 965
+    },
+    "sampleSize": 965,
+    "timeline": [
+      {
+        "t": 0,
+        "count": 95,
+        "rps": 95,
+        "ok": 95,
+        "err": 0,
+        "errRate": 0,
+        "avg": 3.8680168418899963,
+        "p95": 5.960899997502565
+      },
+      {
+        "t": 1,
+        "count": 100,
+        "rps": 100,
+        "ok": 100,
+        "err": 0,
+        "errRate": 0,
+        "avg": 3.620384999997914,
+        "p95": 5.443500000983477
+      },
+      {
+        "t": 2,
+        "count": 100,
+        "rps": 100,
+        "ok": 100,
+        "err": 0,
+        "errRate": 0,
+        "avg": 3.478496999964118,
+        "p95": 6.437800001353025
+      },
+      {
+        "t": 3,
+        "count": 100,
+        "rps": 100,
+        "ok": 100,
+        "err": 0,
+        "errRate": 0,
+        "avg": 3.5081230003759263,
+        "p95": 5.539599999785423
+      },
+      {
+        "t": 4,
+        "count": 100,
+        "rps": 100,
+        "ok": 100,
+        "err": 0,
+        "errRate": 0,
+        "avg": 3.4570590000599624,
+        "p95": 5.1583000011742115
+      },
+      {
+        "t": 5,
+        "count": 91,
+        "rps": 91,
+        "ok": 91,
+        "err": 0,
+        "errRate": 0,
+        "avg": 7.395151648342937,
+        "p95": 22.057300001382828
+      },
+      {
+        "t": 6,
+        "count": 91,
+        "rps": 91,
+        "ok": 91,
+        "err": 0,
+        "errRate": 0,
+        "avg": 9.905516483831208,
+        "p95": 27.32490000128746
+      },
+      {
+        "t": 7,
+        "count": 85,
+        "rps": 85,
+        "ok": 85,
+        "err": 0,
+        "errRate": 0,
+        "avg": 14.903338823686628,
+        "p95": 59.53720000013709
+      },
+      {
+        "t": 8,
+        "count": 102,
+        "rps": 102,
+        "ok": 102,
+        "err": 0,
+        "errRate": 0,
+        "avg": 3.077019607392596,
+        "p95": 9.242400001734495
+      },
+      {
+        "t": 9,
+        "count": 101,
+        "rps": 101,
+        "ok": 101,
+        "err": 0,
+        "errRate": 0,
+        "avg": 2.3104811881364573,
+        "p95": 4.894600000232458
+      }
+    ]
+  },
+  "steps": [],
+  "breakingPoint": null,
+  "abortReason": null,
+  "wallClockSec": 10.05,
+  "rotationCount": 0,
+  "blockedProxies": []
+}

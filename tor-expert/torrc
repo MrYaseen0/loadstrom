@@ -1,0 +1,15 @@
+# Strom Fire Tor Expert Bundle config — full-auto circuit rotation.
+# Copy this file next to tor.exe (or let start-tor-expert.bat do it).
+# WARNING: unauthenticated control port. Localhost-only — never expose 9050/9051 to a network.
+
+SocksPort 9050
+ControlPort 9051
+CookieAuthentication 0
+# Faster circuit turnover for rotation testing (Tor default is ~10 min).
+# Strom Fire rotates on demand with NEWNYM, which works regardless of these —
+# they only affect Tor's own background rotation. Values like 1s exist online
+# but churn circuits constantly: slower tests and needless load on volunteer
+# relays. 60/30 is the sane middle ground.
+MaxCircuitDirtiness 60
+NewCircuitPeriod 30
+DataDirectory .\tor-data
