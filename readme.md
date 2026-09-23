@@ -37,6 +37,17 @@ You need [Node.js](https://nodejs.org) 18+ (free). Nothing else.
 
 Then open <http://127.0.0.1:8787/>. The dashboard opens automatically when you use the launcher scripts. A demo target (`http://127.0.0.1:8787/demo/fast`) is pre-filled so you can run your first test five seconds after launch, safely.
 
+## Security scan
+
+The dashboard's **🛡 Run security scan** button performs a passive, read-only check of the URL in the target field — one request only, no crawling, no payloads:
+
+- **TLS**: protocol version, cipher, certificate expiry, issuer
+- **Security headers**: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- **Cookie flags**: missing `Secure` / `HttpOnly` / `SameSite`
+- **Info disclosure**: `Server` / `X-Powered-By` banners
+
+Each finding gets a severity (high/medium/low/info) with a fix recommendation, plus an overall score out of 100. Same authorisation checkbox and target allow-list as load tests apply.
+
 ## Sign-in (owner only — no sign-up)
 
 Opening the dashboard asks for a sign-in. There is exactly one account, configured on the server — no registration page exists.

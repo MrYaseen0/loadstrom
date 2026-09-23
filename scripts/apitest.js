@@ -155,6 +155,18 @@ async function main() {
     // reset
     const reset = await post('/api/reset', {});
     check('reset works', reset.status === 200 && reset.body.ok === true, JSON.stringify(reset.body));
+
+    // --- security scan endpoint ---
+    const secNoConfirm = await post('/api/security', { url: `${BASE}/demo/fast` });
+    check('security scan requires confirm', secNoConfirm.status === 400 && secNoConfirm.body && !secNoConfirm.body.ok,
+      `status=${secNoConfirm.status}`);
+    const secBlocked = await post('/api/security', { url: 'http://169.254.169.254/', confirm: true });
+    check('security scan rejects unsafe target', secBlocked.status === 400, `status=${secBlocked.status}`);
+    const secScan = await post('/api/security', { url: `${BASE}/demo/fast`, confirm: true });
+    const secFindings = secScan.body && secScan.body.findings;
+    check('security scan returns score + findings',
+      secScan.status === 200 && secScan.body.ok === true && typeof secScan.body.score === 'number' && Array.isArray(secFindings) && secFindings.length > 0,
+      `status=${secScan.status} score=${secScan.body && secScan.body.score} findings=${secFindings && secFindings.length}`);
   } finally {
     server.kill();
   }

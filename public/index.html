@@ -266,6 +266,17 @@ socks5://proxy2.example.com:1080" spellcheck="false" rows="4"></textarea>
       <div class="log" id="log" role="log" aria-live="polite"></div>
     </div>
 
+    <div class="card" id="secCard">
+      <div class="report-head">
+        <h3 style="margin:0">Security scan <span class="kpi" style="display:inline;margin-left:8px;padding:2px 8px;font-size:12px" id="secScore" hidden></span></h3>
+        <div class="actions" style="flex:0 0 auto">
+          <button id="secScanBtn" class="btn tiny" type="button">🛡 Run security scan</button>
+        </div>
+      </div>
+      <div class="hint">Passive, read-only check of the URL above: TLS certificate, security headers, cookie flags, server banners. One request only — no crawling or payloads.</div>
+      <div id="secResults" class="log" role="log" aria-live="polite"><div class="log-empty">No scan yet. Tick the authorisation box, then run.</div></div>
+    </div>
+
     <div class="card" id="historyCard">
       <h3>Test history</h3>
       <div id="historyList" class="history-list"></div>

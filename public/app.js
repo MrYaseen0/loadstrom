@@ -738,6 +738,49 @@ function init() {
     $('detectTorBtn').disabled = false;
   });
 
+  /* ------------------------------ security scan ------------------------------ */
+  const SEV_COLOR = { high: '#ff5d6c', medium: '#f5b544', low: '#4c8dff', info: '#22d3a6' };
+  $('secScanBtn').addEventListener('click', async () => {
+    const url = $('url').value.trim();
+    const box = $('secResults');
+    const scoreEl = $('secScore');
+    if (!url) { showError('Paste a URL first.'); return; }
+    if (!$('confirm').checked) { showError('Tick the authorisation checkbox first.'); return; }
+    showError('');
+    const btn = $('secScanBtn');
+    btn.disabled = true;
+    box.innerHTML = '<div class="log-empty">Scanning…</div>';
+    scoreEl.hidden = true;
+    try {
+      const r = await fetch('/api/security', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ url, confirm: true, tlsVerify: $('tlsVerify').checked }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error((d && d.error) || ('HTTP ' + r.status));
+      scoreEl.hidden = false;
+      scoreEl.textContent = 'score ' + d.score + '/100';
+      scoreEl.style.borderColor = d.score >= 80 ? 'var(--pass)' : (d.score >= 50 ? '#f5b544' : 'var(--fail)');
+      box.innerHTML = '';
+      (d.findings || []).forEach((f) => {
+        const div = document.createElement('div');
+        div.className = 'rot-entry';
+        const color = SEV_COLOR[f.severity] || '#999';
+        div.innerHTML = `<span class="rot-time" style="color:${color};font-weight:700">${escapeHtml((f.severity || '').toUpperCase())}</span> ` +
+          `<strong>${escapeHtml(f.passed ? '✓' : '✗')} ${escapeHtml(f.title)}</strong><br>` +
+          `<span style="color:var(--txt-dim)">${escapeHtml(f.detail || '')}</span>` +
+          (f.recommendation ? `<br><span style="color:var(--txt-dim)">→ ${escapeHtml(f.recommendation)}</span>` : '');
+        box.appendChild(div);
+      });
+      box.scrollTop = 0;
+      logLine(`Security scan done: score ${d.score}/100, ${(d.findings || []).filter((f) => !f.passed).length} findings.`);
+    } catch (e) {
+      box.innerHTML = '<div class="log-empty">Scan failed: ' + escapeHtml(e.message) + '</div>';
+    }
+    btn.disabled = false;
+  });
+
   /* presets */
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {

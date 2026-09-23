@@ -9,6 +9,7 @@ const { URL } = require('url');
 const { LoadEngine, tlsOptionsForFingerprint } = require('./lib/engine');
 const { validateTarget, validateTargetResolved } = require('./lib/safety');
 const { redactProxyUrl } = require('./lib/util');
+const security = require('./lib/security');
 const { pickControlPort } = require('./check-tor-control');
 const auth = require('./lib/auth');
 
@@ -711,6 +712,43 @@ async function handleApi(req, res, url) {
       return sendJson(res, 200, await validateTargetResolved(body.url || body.target));
     } catch (e) {
       return sendJson(res, 200, fast);
+    }
+  }
+
+  // Passive security scan: single read-only GET, no crawling/fuzzing/payloads.
+  // Same safety gate as /api/start — only targets you own or may test.
+  if (pathname === '/api/security' && req.method === 'POST') {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+    req.on('close', () => clearTimeout(timer));
+    let body;
+    try {
+      body = JSON.parse((await readBody(req, ctrl.signal)) || '{}');
+    } catch (e) {
+      clearTimeout(timer);
+      return sendJson(res, 400, { ok: false, error: 'Invalid JSON body.' });
+    }
+    clearTimeout(timer);
+    if (body.confirm !== true) {
+      return sendJson(res, 400, {
+        ok: false,
+        error: 'You must tick the authorisation checkbox (confirm=true): you own the target or have written permission to test it.',
+      });
+    }
+    const fastCheck = validateTarget(body.url || body.target);
+    if (!fastCheck.ok) return sendJson(res, 400, { ok: false, error: fastCheck.reason, safety: fastCheck });
+    try {
+      const full = await validateTargetResolved(body.url || body.target);
+      if (!full.ok) return sendJson(res, 400, { ok: false, error: full.reason, safety: full });
+    } catch (e) { /* fall through with fastCheck */ }
+    try {
+      const scan = await security.runSecurityScan(body.url || body.target, {
+        timeoutMs: 15000,
+        tlsVerify: body.tlsVerify !== false,
+      });
+      return sendJson(res, 200, Object.assign({ ok: true }, scan));
+    } catch (e) {
+      return sendJson(res, 500, { ok: false, error: (e && e.message) || 'Scan failed.' });
     }
   }
 
