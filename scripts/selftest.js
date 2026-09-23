@@ -173,6 +173,8 @@ async function main() {
   try { await testHttp2(check); } catch (e) { check("h2: regression harness did not crash", false, e.message); }
   try { await testDefense(check); } catch (e) { check("defense: harness did not crash", false, e.message); }
   try { await testRetryAfter(check); } catch (e) { check("retry-after: harness did not crash", false, e.message); }
+  try { await testSpike(check); } catch (e) { check("spike: harness did not crash", false, e.message); }
+  try { await testSoakDegradation(check); } catch (e) { check("soak: harness did not crash", false, e.message); }
 
   fixture.close();
   console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : failures + ' CHECK(S) FAILED'}`);
@@ -252,3 +254,65 @@ main().catch((e) => {
   console.error('selftest crashed:', e);
   process.exit(1);
 });
+
+/* ---- spike mode: instant burst to N users, hold, stop ---- */
+async function testSpike(check) {
+  const srv = http.createServer((req, res) => { res.writeHead(200); res.end('ok'); });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const port = srv.address().port;
+  const eng = new LoadEngine({
+    url: 'http://127.0.0.1:' + port + '/', mode: 'spike',
+    spikeUsers: 20, spikeHoldSec: 3, confirm: true,
+  }, {});
+  const t0 = Date.now();
+  await eng.run();
+  const wall = (Date.now() - t0) / 1000;
+  const s = eng.summary();
+  check('spike: config normalized', eng.cfg.mode === 'spike' && eng.cfg.spikeUsers === 20, 'mode=' + eng.cfg.mode);
+  check('spike: ran about the hold time', wall >= 2.5 && wall < 12, wall.toFixed(1) + 's');
+  check('spike: requests went out', s.metrics.attempted > 50, String(s.metrics.attempted));
+  check('spike: verdict pass on a healthy target', s.result.status === 'pass', s.result.status);
+  srv.close();
+}
+
+/* ---- soak mode: first-half vs second-half degradation ---- */
+async function testSoakDegradation(check) {
+  // Unit-level: fake the half counters and verify the comparison math.
+  const eng = new LoadEngine({ url: 'http://127.0.0.1:9/', mode: 'soak', concurrency: 5, durationSec: 60, confirm: true }, {});
+  // first half: 1000 req, 1% errors, avg 50ms; second half: 1000 req, 5% errors, avg 200ms
+  eng._soakHalf = { attempted: 1000, failed: 10, sumLat: 50000, countLat: 1000 };
+  eng.global.attempted = 2000; eng.global.failed = 60; eng.global.sumLat = 250000; eng.global.countLat = 2000;
+  const d = eng._soakDegradation();
+  check('soak: degradation detected when second half is worse', !!(d && d.degraded),
+    d ? `err ${d.firstHalf.errRate}->${d.secondHalf.errRate}` : 'no result');
+  // stable run: no false positive
+  eng.global.failed = 20; eng.global.sumLat = 100000; // still 1% errors, avg 50ms in both halves
+  const d2 = eng._soakDegradation();
+  check('soak: no false positive on a stable run', !!(d2 && d2.checked && !d2.degraded), String(d2 && d2.degraded));
+  // not applicable outside soak mode
+  const eng2 = new LoadEngine({ url: 'http://127.0.0.1:9/', mode: 'load', concurrency: 5, durationSec: 10, confirm: true }, {});
+  eng2._soakHalf = { attempted: 100, failed: 1, sumLat: 5000, countLat: 100 };
+  check('soak: not applicable outside soak mode', eng2._soakDegradation() === null);
+
+  // End-to-end: fixture gets slow in the second half -> verdict must warn.
+  const t0 = Date.now();
+  const srv = http.createServer((req, res) => {
+    const elapsed = Date.now() - t0;
+    if (elapsed > 12000) { setTimeout(() => { res.writeHead(200); res.end('ok'); }, 600); }
+    else { res.writeHead(200); res.end('ok'); }
+  });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const port = srv.address().port;
+  const eng3 = new LoadEngine({
+    url: 'http://127.0.0.1:' + port + '/', mode: 'soak',
+    concurrency: 4, durationSec: 24, confirm: true,
+    thresholds: { maxErrorRatePct: 50, maxP95Ms: 100000 }, // don't fail on latency; only the soak rule should fire
+  }, {});
+  await eng3.run();
+  const s3 = eng3.summary();
+  check('soak: half checkpoint was captured', !!(s3.soak && s3.soak.checked), JSON.stringify(s3.soak && s3.soak.checked));
+  check('soak: degradation flagged', !!(s3.soak && s3.soak.degraded), JSON.stringify(s3.soak && { f: s3.soak.firstHalf, s: s3.soak.secondHalf }));
+  check('soak: verdict is warn with a soak reason', s3.result.status === 'warn' && s3.result.reasons.some((r) => /soak degradation/i.test(r)),
+    s3.result.status + ' / ' + (s3.result.reasons[0] || '').slice(0, 60));
+  srv.close();
+}

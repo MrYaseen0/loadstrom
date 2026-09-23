@@ -46,6 +46,8 @@
     <div class="seg" role="tablist" aria-label="Load mode">
       <button class="seg-btn active" data-mode="load" role="tab" aria-selected="true" type="button">Steady load</button>
       <button class="seg-btn" data-mode="stress" role="tab" aria-selected="false" type="button">Stress / ramp</button>
+      <button class="seg-btn" data-mode="spike" role="tab" aria-selected="false" type="button">Spike burst</button>
+      <button class="seg-btn" data-mode="soak" role="tab" aria-selected="false" type="button">Soak test</button>
     </div>
 
     <div id="loadFields">
@@ -76,6 +78,30 @@
       </div>
       <label class="field"><span>Seconds per step</span><input id="stDur" type="number" min="1" step="1" value="15"></label>
       <div class="hint">Stress mode climbs user count step by step until the site fails your rules — that level is your breaking point.</div>
+    </div>
+
+    <div id="spikeFields" hidden>
+      <div class="row">
+        <label class="field"><span>Spike users</span>
+          <input id="spikeUsers" type="number" min="1" max="10000" step="10" value="500">
+        </label>
+        <label class="field"><span>Hold peak (s)</span>
+          <input id="spikeHoldSec" type="number" min="1" max="3600" step="1" value="30">
+        </label>
+      </div>
+      <div class="hint">Spike mode jumps straight to the peak with no ramp-up, holds it, then stops. Answers: does the site survive a sudden traffic burst?</div>
+    </div>
+
+    <div id="soakFields" hidden>
+      <div class="row">
+        <label class="field"><span>Concurrent users</span>
+          <input id="soakUsers" type="number" min="1" max="10000" step="1" value="25">
+        </label>
+        <label class="field"><span>Duration (s)</span>
+          <input id="soakDurationSec" type="number" min="20" max="7200" step="60" value="1800" title="Long and low — 30 min minimum is typical">
+        </label>
+      </div>
+      <div class="hint">Soak mode holds a steady low load for a long time. The verdict compares first-half vs second-half error rate and latency — decay means a leak or queue build-up.</div>
     </div>
 
     <h2>3 · Pass / fail rules</h2>
@@ -189,7 +215,7 @@ socks5://proxy2.example.com:1080" spellcheck="false" rows="4"></textarea>
         <button class="btn tiny preset-btn" data-preset="aggressive">Aggressive</button>
         <button class="btn tiny preset-btn" data-preset="stress">Stress</button>
       </div>
-      <div class="hint">Gentle = 10 users, safe thresholds. Normal = 50 users. Aggressive = 200 users, tight timeouts. Stress = ramp mode, find breaking point.</div>
+      <div class="hint">Gentle = 10 users, safe thresholds. Normal = 50 users. Aggressive = 200 users, tight timeouts. Stress = ramp mode, find breaking point. Spike = sudden burst. Soak = long low load, catches leaks.</div>
     </details>
 
     <div class="check auth">

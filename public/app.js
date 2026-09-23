@@ -383,6 +383,8 @@ function setMode(mode) {
   });
   $('loadFields').hidden = mode !== 'load';
   $('stressFields').hidden = mode !== 'stress';
+  $('spikeFields').hidden = mode !== 'spike';
+  $('soakFields').hidden = mode !== 'soak';
 }
 
 function readConfig() {
@@ -430,8 +432,15 @@ function readConfig() {
       max: Number($('stMax').value),
       stepDurationSec: Number($('stDur').value),
     },
+    spikeUsers: Number($('spikeUsers').value) || 500,
+    spikeHoldSec: Number($('spikeHoldSec').value) || 30,
     confirm: $('confirm').checked,
   };
+  if (state.mode === 'soak') {
+    // Soak uses its own low-and-long inputs instead of the load profile fields.
+    cfg.concurrency = Math.min(10000, Number($('soakUsers').value) || 25);
+    cfg.durationSec = Math.min(7200, Number($('soakDurationSec').value) || 1800);
+  }
   if (headersRaw) cfg.headers = headersRaw;
   if (bodyRaw) cfg.body = bodyRaw;
   return cfg;
@@ -572,6 +581,11 @@ function reportCsv(report) {
     ['defense_type', (report.defense && report.defense.type) || ''],
     ['defense_first_seen_request', (report.defense && report.defense.firstSeenRequest) || ''],
     ['rate_limited_responses', report.rateLimited || 0],
+    ['soak_degradation', report.soak && report.soak.checked ? (report.soak.degraded ? 'yes' : 'no') : 'n/a'],
+    ['soak_first_half_err_pct', report.soak && report.soak.firstHalf ? (report.soak.firstHalf.errRate * 100).toFixed(2) : ''],
+    ['soak_second_half_err_pct', report.soak && report.soak.secondHalf ? (report.soak.secondHalf.errRate * 100).toFixed(2) : ''],
+    ['soak_first_half_avg_ms', report.soak && report.soak.firstHalf ? report.soak.firstHalf.avgMs : ''],
+    ['soak_second_half_avg_ms', report.soak && report.soak.secondHalf ? report.soak.secondHalf.avgMs : ''],
   ];
   return rows.map((r) => r.join(',')).join('\n') + '\n';
 }

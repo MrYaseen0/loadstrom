@@ -80,7 +80,9 @@ node server.js
 1. **Smoke** — 5 users, 30 s. Does everything work at all?
 2. **Steady load** — set the concurrent users you actually expect in production (e.g. 200). Watch p95 latency and error rate.
 3. **Stress (ramp)** — start 20, step 20, max 500. The tool climbs until your pass/fail rules break, then tells you your **breaking point**.
-4. Read the verdict: green = handled, amber = bending, red = broke. Export the JSON/CSV report for your records.
+4. **Spike (burst)** — jumps straight to N users with no ramp and holds the peak. Answers: does the site survive a sudden traffic burst?
+5. **Soak (endurance)** — steady low load for a long time (30+ min is typical). The verdict compares first-half vs second-half error rate and latency — decay means a leak, queue build-up, or connection exhaustion.
+6. Read the verdict: green = handled, amber = bending, red = broke. Export the JSON/CSV report for your records.
 
 Rules of thumb baked into the defaults (edit them per test):
 

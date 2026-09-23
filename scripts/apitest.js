@@ -139,6 +139,26 @@ async function main() {
     }
     check('stress produced ramp steps', stressDone && stressDone.steps && stressDone.steps.length >= 1, stressDone && JSON.stringify(stressDone.steps));
 
+    // spike mode quick run via API
+    const spike = await post('/api/start', {
+      url: `${BASE}/demo/fast`,
+      confirm: true,
+      mode: 'spike',
+      spikeUsers: 10,
+      spikeHoldSec: 2,
+      timeoutMs: 5000,
+      thresholds: { maxErrorRatePct: 50, maxP95Ms: 100000 },
+    });
+    check('spike start accepted (202)', spike.status === 202, JSON.stringify(spike.body));
+    let spikeDone = null;
+    for (let i = 0; i < 40; i++) {
+      await sleep(500);
+      const s = await fetch(`${BASE}/api/status`).then((r) => r.json());
+      if (s.engineState === 'finished' || s.engineState === 'error') { spikeDone = s; break; }
+    }
+    check('spike finished and kept its mode', spikeDone && spikeDone.mode === 'spike', spikeDone && String(spikeDone.mode));
+    check('spike sent requests', spikeDone && spikeDone.attempted > 10, String(spikeDone && spikeDone.attempted));
+
     // oversized body rejected with 413 (64KB cap)
     const big = await post('/api/start', { url: `${BASE}/demo/fast`, confirm: true, body: 'x'.repeat(70000) });
     check('oversized body rejected (413)', big.status === 413, `status=${big.status}`);
