@@ -159,6 +159,53 @@ async function main() {
     server.kill();
   }
 
+  // --- demo target under sign-in: the engine must carry the caller's session
+  // to the local /demo/* endpoint, otherwise every hit 401s (dead demo button).
+  const APORT = 8898;
+  const ABASE = `http://127.0.0.1:${APORT}`;
+  const aserver = spawn(process.execPath, [path.join(__dirname, '..', 'server.js')], {
+    env: Object.assign({}, process.env, {
+      PORT: String(APORT), HOST: '127.0.0.1', OPEN_BROWSER: '0',
+      STROMFIRE_PASSWORD: 'apitest-secret',
+    }),
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  aserver.stderr.on('data', (d) => process.stderr.write(String(d)));
+  const apost = async (pathname, body, cookie) => {
+    const r = await fetch(`${ABASE}${pathname}`, {
+      method: 'POST',
+      headers: Object.assign({ 'content-type': 'application/json' }, cookie ? { cookie } : {}),
+      body: JSON.stringify(body || {}),
+    });
+    const setCookie = r.headers.get('set-cookie') || '';
+    return { status: r.status, body: await r.json().catch(() => null), setCookie };
+  };
+  try {
+    let up = false;
+    const t0 = Date.now();
+    while (Date.now() - t0 < 8000) {
+      try { const r = await fetch(`${ABASE}/api/health`); if (r.ok) { up = true; break; } } catch (e) {}
+      await sleep(200);
+    }
+    check('auth-enabled server boots', up);
+    if (up) {
+      const login = await apost('/api/login', { username: 'admin', password: 'apitest-secret' });
+      check('login works on auth server', login.status === 200 && login.body.ok === true, `status=${login.status}`);
+      const cookie = (login.setCookie.split(';')[0] || '').trim();
+      const st = await apost('/api/start', {
+        url: `${ABASE}/demo/fast`, mode: 'load', concurrency: 5, durationSec: 3, confirm: true,
+      }, cookie);
+      check('demo test starts under sign-in', st.status === 202, `status=${st.status}`);
+      await sleep(4500);
+      const rep = await fetch(`${ABASE}/api/report`, { headers: { cookie } }).then((r) => r.json());
+      const m = rep && rep.report && rep.report.metrics;
+      check('demo test passes session to engine (no 401s)', !!m && m.ok > 0 && m.failed === 0,
+        m ? `ok=${m.ok} failed=${m.failed} codes=${JSON.stringify(m.statusCounts)}` : 'no report');
+    }
+  } finally {
+    aserver.kill();
+  }
+
   console.log(`\n${failures === 0 ? 'ALL API CHECKS PASSED' : failures + ' API CHECK(S) FAILED'}`);
   process.exit(failures === 0 ? 0 : 1);
 }

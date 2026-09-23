@@ -759,6 +759,25 @@ async function handleApi(req, res, url) {
       return sendJson(res, 400, { ok: false, error: check.reason, safety: check });
     }
 
+    // Local demo targets need the caller's session: the engine makes its own
+    // server-side requests and never sees the browser cookies, so without this
+    // every demo hit would 401 when sign-in is on (dead demo button).
+    if (auth.authEnabled) {
+      try {
+        const t = new URL(body.url || body.target);
+        const localHost = t.hostname === '127.0.0.1' || t.hostname === 'localhost' || t.hostname === '::1' || t.hostname === '[::1]';
+        const defaultPort = t.protocol === 'https:' ? 443 : 80;
+        const isLocalDemo = localHost && Number(t.port || defaultPort) === PORT &&
+          (t.pathname === '/demo' || t.pathname.startsWith('/demo/'));
+        if (isLocalDemo && auth.requestSession(req)) {
+          const m = String(req.headers.cookie || '').match(/(?:^|;\s*)stromfire_session=([^;]+)/);
+          if (m) {
+            body.headers = Object.assign({}, body.headers, { cookie: `${auth.SESSION_COOKIE}=${m[1]}` });
+          }
+        }
+      } catch (e) { /* not a parseable URL — safety gate already rejected it */ }
+    }
+
     try {
       engine = new LoadEngine(body, {
         onEvent: (e) => {
