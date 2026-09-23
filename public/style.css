@@ -151,6 +151,7 @@ details.adv[open] summary { margin-bottom: 12px; }
 .verdict.pass { border-color: rgba(34, 211, 166, .55); background: linear-gradient(180deg, rgba(34,211,166,.16), rgba(20,27,38,.6)); }
 .verdict.warn { border-color: rgba(245, 181, 68, .55); background: linear-gradient(180deg, rgba(245,181,68,.16), rgba(20,27,38,.6)); }
 .verdict.fail { border-color: rgba(255, 93, 108, .6); background: linear-gradient(180deg, rgba(255,93,108,.18), rgba(20,27,38,.6)); }
+.verdict.defended { border-color: rgba(76, 141, 255, .6); background: linear-gradient(180deg, rgba(76,141,255,.16), rgba(20,27,38,.6)); }
 .v-headline { font-size: 19px; font-weight: 700; }
 .v-sub { font-size: 13.5px; color: var(--txt-dim); margin-top: 5px; }
 .v-reasons { margin: 10px 0 0; padding-left: 18px; font-size: 13px; color: var(--txt-dim); }

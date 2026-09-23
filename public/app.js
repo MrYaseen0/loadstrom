@@ -155,7 +155,8 @@ function renderVerdict(payload) {
   }
   if (!r) return;
 
-  cls = r.status; badge = r.status === 'pass' ? 'Pass' : r.status === 'warn' ? 'Warnings' : 'Fail';
+  cls = r.status;
+  badge = r.status === 'pass' ? 'Pass' : r.status === 'warn' ? 'Warnings' : r.status === 'defended' ? 'Defended' : 'Fail';
   headline = r.headline;
   const reasons = (r.reasons || []).map((x) => `<li>${escapeHtml(x)}</li>`).join('');
   const recos = (r.recommendations || []).map((x) => `<li>${escapeHtml(x)}</li>`).join('');
@@ -228,7 +229,7 @@ function renderSteps(steps) {
   const tb = $('stepsTable').querySelector('tbody');
   tb.innerHTML = steps
     .map((s) => {
-      const cls = s.verdict === 'fail' ? 's5' : s.verdict === 'warn' ? 's4' : 's2';
+      const cls = s.verdict === 'fail' ? 's5' : (s.verdict === 'warn' || s.verdict === 'defended') ? 's4' : 's2';
       return `<tr><td>${fmtNum(s.concurrency)}</td><td class="num">${fmtNum(s.rps)}</td><td class="num">${fmtMs(s.p95)}</td><td class="num">${fmtNum(s.errPct, 2)}</td><td><span class="badge ${cls}">${escapeHtml(s.verdict)}</span></td></tr>`;
     })
     .join('');
@@ -273,6 +274,10 @@ function connect() {
         const errors = p.recentErrors || 0;
         logRotation(`Block detected — ${timeouts} timeouts, ${errors} errors, rotating...`, 'rot-warn');
         logLine(`Block detected (#${state.rotationCount})`);
+      }
+      else if (p.event === 'defense-detected') {
+        const d = p.defense || {};
+        logLine(`🛡 Target defense triggered: ${escapeHtml(d.type || 'protection')} (HTTP ${d.dominantCode || '?'}) at request #${d.firstSeenRequest || '?'} — test stopped, verdict: defended.`);
       }
       return;
     }
@@ -563,6 +568,10 @@ function reportCsv(report) {
     ['latency_p99_ms', m.latency.p99.toFixed(2)],
     ['latency_max_ms', m.latency.max.toFixed(2)],
     ['bytes', m.bytes],
+    ['defense_detected', report.defense && report.defense.detected ? 'yes' : 'no'],
+    ['defense_type', (report.defense && report.defense.type) || ''],
+    ['defense_first_seen_request', (report.defense && report.defense.firstSeenRequest) || ''],
+    ['rate_limited_responses', report.rateLimited || 0],
   ];
   return rows.map((r) => r.join(',')).join('\n') + '\n';
 }

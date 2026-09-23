@@ -167,6 +167,25 @@ async function main() {
     check('security scan returns score + findings',
       secScan.status === 200 && secScan.body.ok === true && typeof secScan.body.score === 'number' && Array.isArray(secFindings) && secFindings.length > 0,
       `status=${secScan.status} score=${secScan.body && secScan.body.score} findings=${secFindings && secFindings.length}`);
+
+    // --- target-defense detection via /demo/wall (200s, then 403 wall) ---
+    const wallStart = await post('/api/start', { url: `${BASE}/demo/wall`, mode: 'load', concurrency: 4, durationSec: 20, confirm: true });
+    check('wall test starts', wallStart.status === 202, `status=${wallStart.status}`);
+    let wallRep = null;
+    for (let i = 0; i < 30; i++) {
+      await sleep(1000);
+      try {
+        const jr = await fetch(`${BASE}/api/report`).then((r) => r.json());
+        wallRep = jr && jr.report;
+      } catch (e) { /* server busy */ }
+      if (wallRep && wallRep.state === 'finished') break;
+    }
+    check('wall test finished early on defense', !!wallRep && wallRep.state === 'finished' && wallRep.wallClockSec < 15,
+      wallRep ? `state=${wallRep.state} wall=${wallRep.wallClockSec}s` : 'no report');
+    check('defense detected in report', !!(wallRep && wallRep.defense && wallRep.defense.detected),
+      wallRep && wallRep.defense ? `type=${wallRep.defense.type} code=${wallRep.defense.dominantCode}` : 'no defense');
+    check('verdict is defended', !!(wallRep && wallRep.result && wallRep.result.status === 'defended'),
+      wallRep && wallRep.result && wallRep.result.status);
   } finally {
     server.kill();
   }

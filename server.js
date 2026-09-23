@@ -123,6 +123,7 @@ let engine = null;
 let lastReport = loadPersistedReport();
 const sseClients = new Set();
 let sseTimer = null;
+let demoWallHits = 0; // /demo/wall: 200 for the first 25 hits, then 403 (simulated WAF)
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -332,6 +333,7 @@ code{background:#161b22;padding:2px 6px;border-radius:5px}a{color:#58a6ff}li{mar
 <li><a href="/demo/slow?ms=200"><code>/demo/slow?ms=200</code></a> — fixed artificial delay</li>
 <li><a href="/demo/heavy?ms=50&kb=50"><code>/demo/heavy?ms=50&kb=50</code></a> — delay + payload</li>
 <li><a href="/demo/flaky?rate=0.1"><code>/demo/flaky?rate=0.1</code></a> — returns 5xx for a fraction of requests</li>
+<li><a href="/demo/wall"><code>/demo/wall</code></a> — 200 for the first 25 hits, then 403 (simulates a WAF kicking in; exercises defense detection)</li>
 </ul>
 <p>Tip: run Stress mode against <code>/demo/slow?ms=120</code> to watch the tool find a breaking point.</p>
 </body></html>`;
@@ -345,6 +347,8 @@ function handleDemo(req, res, url) {
   const ms = Math.min(5000, Math.max(0, Number(q.get('ms') || 0)));
   const kb = Math.min(2048, Math.max(0, Number(q.get('kb') || 0)));
   const proto = getProto();
+  // Simulates a WAF/rate-limiter kicking in: 200s first, then 403s.
+  // Used to exercise the target-defense detection (verdict: defended).
 
   const finish = (code, body, type) => {
     const payload = Buffer.isBuffer(body) ? body : Buffer.from(String(body));
@@ -375,6 +379,9 @@ function handleDemo(req, res, url) {
         const rate = Math.min(1, Math.max(0, Number(q.get('rate') || 0.1)));
         return Math.random() < rate ? finish(500, 'boom') : finish(200, 'ok');
       }
+      case '/demo/wall':
+        demoWallHits++;
+        return demoWallHits <= 25 ? finish(200, 'ok') : finish(403, 'blocked by demo wall');
       default:
         return finish(404, 'not found');
     }

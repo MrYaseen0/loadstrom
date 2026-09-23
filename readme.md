@@ -48,6 +48,16 @@ The dashboard's **🛡 Run security scan** button performs a passive, read-only 
 
 Each finding gets a severity (high/medium/low/info) with a fix recommendation, plus an overall score out of 100. Same authorisation checkbox and target allow-list as load tests apply.
 
+## Target-defense detection
+
+If the target's protection kicks in mid-run — a sustained run of **403 / 429 / 503** responses (WAF block, rate limiter, service protection) — the engine detects it, stops the test, and reports a **Defended** verdict instead of a generic failure:
+
+- Records which defense triggered, the dominant status code, the request number and RPS where it first appeared.
+- On **429/503 with a `Retry-After` header**, the engine backs off for the requested time (max 30s) before continuing — good-citizen behavior.
+- Recommendations explain how to re-run for raw capacity (allow-list the test IP / add a WAF bypass rule) instead of hammering the protection layer.
+
+Try it against the built-in demo: run a load test on `/demo/wall` — it answers 200 for the first 25 hits, then 403s like a WAF switching on.
+
 ## Sign-in (owner only — no sign-up)
 
 Opening the dashboard asks for a sign-in. There is exactly one account, configured on the server — no registration page exists.

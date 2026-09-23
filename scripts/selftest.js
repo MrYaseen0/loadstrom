@@ -171,6 +171,8 @@ async function main() {
   }
 
   try { await testHttp2(check); } catch (e) { check("h2: regression harness did not crash", false, e.message); }
+  try { await testDefense(check); } catch (e) { check("defense: harness did not crash", false, e.message); }
+  try { await testRetryAfter(check); } catch (e) { check("retry-after: harness did not crash", false, e.message); }
 
   fixture.close();
   console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : failures + ' CHECK(S) FAILED'}`);
@@ -200,6 +202,49 @@ async function testHttp2(check) {
   await eng.run();
   const m = eng.summary().metrics;
   check('h2: full run over HTTP/2 succeeds', m.ok > 0 && m.failed === 0, m.ok + ' ok / ' + m.failed + ' failed');
+  srv.close();
+}
+
+
+/* ---- target-defense detection: WAF-style 403 wall mid-run ---- */
+async function testDefense(check) {
+  let hits = 0;
+  const wall = http.createServer((req, res) => {
+    hits++;
+    if (hits <= 30) { res.writeHead(200); res.end('ok'); }
+    else { res.writeHead(403); res.end('blocked'); }
+  });
+  await new Promise((r) => wall.listen(0, '127.0.0.1', r));
+  const port = wall.address().port;
+  const eng = new LoadEngine({ url: 'http://127.0.0.1:' + port + '/', mode: 'load', concurrency: 4, durationSec: 20, confirm: true }, {});
+  await eng.run();
+  const s = eng.summary();
+  check('defense: detected when 403s take over', !!(s.defense && s.defense.detected),
+    s.defense ? ('type=' + s.defense.type + ' code=' + s.defense.dominantCode) : 'no defense object');
+  check('defense: type is ip-block', s.defense && s.defense.type === 'ip-block', s.defense && s.defense.type);
+  check('defense: verdict is defended', s.result.status === 'defended', s.result.status);
+  check('defense: stopped early, not full duration', s.wallClockSec < 14, s.wallClockSec + 's of 20s planned');
+  check('defense: abort reason names the defense', /defense/i.test(s.abortReason || ''), (s.abortReason || '').slice(0, 70));
+  wall.close();
+}
+
+/* ---- Retry-After honoring: 429 + Retry-After backs the worker off ---- */
+async function testRetryAfter(check) {
+  let hits = 0;
+  const srv = http.createServer((req, res) => {
+    hits++;
+    if (hits <= 8) { res.writeHead(429, { 'retry-after': '1' }); res.end('slow down'); }
+    else { res.writeHead(200); res.end('ok'); }
+  });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const port = srv.address().port;
+  const eng = new LoadEngine({ url: 'http://127.0.0.1:' + port + '/', mode: 'load', concurrency: 2, durationSec: 10, confirm: true,
+    thresholds: { maxErrorRatePct: 100, maxP95Ms: 60000, minRps: 0 } }, {});
+  await eng.run();
+  const s = eng.summary();
+  check('retry-after: 429s were counted', s.rateLimited > 0, 'rateLimited=' + s.rateLimited);
+  check('retry-after: run still completed with ok responses', s.metrics.ok > 0, 'ok=' + s.metrics.ok);
+  check('retry-after: defense NOT misfiring on a few 429s', !s.defense, s.defense ? 'fired' : 'quiet');
   srv.close();
 }
 
