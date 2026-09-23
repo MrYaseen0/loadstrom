@@ -1,0 +1,140 @@
+{
+ "generatedAt": "2026-09-23T18:59:48.628Z",
+ "state": "finished",
+ "error": null,
+ "config": {
+  "url": "https://yaseenahmadexe.vercel.app",
+  "host": "yaseenahmadexe.vercel.app",
+  "method": "GET",
+  "mode": "load",
+  "concurrency": 5,
+  "rps": 0,
+  "durationSec": 12,
+  "rampUpSec": 3,
+  "timeoutMs": 15000,
+  "httpVersion": "1.1",
+  "trackPhases": true,
+  "pacing": "standard",
+  "thresholds": {
+   "maxErrorRatePct": 5,
+   "maxP95Ms": 5000,
+   "minRps": 0
+  },
+  "stress": {
+   "start": 50,
+   "step": 50,
+   "max": 500,
+   "stepDurationSec": 30
+  },
+  "headers": [
+   "user-agent",
+   "accept",
+   "accept-language",
+   "accept-encoding",
+   "sec-ch-ua",
+   "sec-ch-ua-mobile",
+   "sec-ch-ua-platform",
+   "sec-fetch-dest",
+   "sec-fetch-mode",
+   "sec-fetch-site",
+   "sec-fetch-user",
+   "upgrade-insecure-requests"
+  ],
+  "hasBody": false,
+  "autoRotate": false,
+  "torControlPort": 9151,
+  "blockThresholdPct": 70
+ },
+ "result": {
+  "status": "fail",
+  "headline": "Not handled: 18.87% errors, p95 448 ms at 21 rps.",
+  "reasons": [
+   "Error rate 18.87% exceeds the allowed 5%."
+  ],
+  "recommendations": [
+   "The server started failing under this load. Identify the bottleneck before increasing traffic: check CPU/RAM/disk I/O, database connection pools, worker/process counts, timeouts, and upstream rate limits.",
+   "Errors at 18.87% often mean exhaustion: connection limits, too few app workers, or 5xx from an overwhelmed dependency. Check server logs for the exact status codes.",
+   "Latency percentiles are estimated from a reservoir sample of 53 requests (exact count/avg/min/max)."
+  ]
+ },
+ "metrics": {
+  "elapsedSec": 2.55,
+  "attempted": 53,
+  "completed": 53,
+  "ok": 43,
+  "failed": 10,
+  "timeouts": 0,
+  "connErrors": 0,
+  "bytes": 1460674,
+  "rps": 20.800627943485086,
+  "attemptedRps": 20.800627943485086,
+  "errRate": 0.18867924528301888,
+  "latency": {
+   "min": 46.82837500004098,
+   "max": 481.19612300023437,
+   "avg": 109.09137049059049,
+   "p50": 70.97241300018504,
+   "p90": 170.7967719999142,
+   "p95": 447.5150880003348,
+   "p99": 481.19612300023437,
+   "dns_p50": 0,
+   "dns_p95": 0,
+   "dns_p99": 0,
+   "tcp_p50": 0.001142000313848257,
+   "tcp_p95": 0.003895999863743782,
+   "tcp_p99": 0.018698000349104404,
+   "tls_p50": 50.37732299976051,
+   "tls_p95": 88.77800500020385,
+   "tls_p99": 365.2979529998265,
+   "ttfb_p50": 22.286790000274777,
+   "ttfb_p95": 46.82786400010809,
+   "ttfb_p99": 58.25043300027028,
+   "download_p50": 0.31382100004702806,
+   "download_p95": 351.7604580000043,
+   "download_p99": 391.4413419999182
+  },
+  "statusCounts": {
+   "200": 43,
+   "403": 10
+  },
+  "sampleSize": 53,
+  "timeline": [
+   {
+    "t": 0,
+    "count": 3,
+    "rps": 3,
+    "ok": 3,
+    "err": 0,
+    "errRate": 0,
+    "avg": 325.9353626666901,
+    "p95": 481.19612300023437
+   },
+   {
+    "t": 1,
+    "count": 31,
+    "rps": 31,
+    "ok": 26,
+    "err": 5,
+    "errRate": 0.16129032258064516,
+    "avg": 99.43557974191442,
+    "p95": 429.44398700026795
+   },
+   {
+    "t": 2,
+    "count": 19,
+    "rps": 19,
+    "ok": 14,
+    "err": 5,
+    "errRate": 0.2631578947368421,
+    "avg": 90.60703031588837,
+    "p95": 447.5150880003348
+   }
+  ]
+ },
+ "steps": [],
+ "breakingPoint": null,
+ "abortReason": "auto-aborted: error rate reached 18.0% (abort threshold 10%) after 50 requests",
+ "wallClockSec": 2.41,
+ "rotationCount": 0,
+ "blockedProxies": []
+}

@@ -1,9 +1,49 @@
 'use strict';
+// End-to-end test for Strom Fire. Self-contained: boots its own server on a
+// free localhost port, runs all checks, shuts the server down.
 // Usage:
-//   node server.js &            (or PORT=8787 node server.js)
-//   PORT=8787 node scripts/e2e-test.js   (default port 8787; exits non-zero on failure)
+//   node scripts/e2e-test.js          (or: npm run e2e)
+// Exits non-zero on failure.
 const http = require('http');
-const PORT = Number(process.env.PORT || 8787);
+const path = require('path');
+const { spawn } = require('child_process');
+
+let PORT = Number(process.env.E2E_PORT || 0); // 0 = pick a free port at runtime
+let child = null;
+
+function pickFreePort() {
+  return new Promise((resolve, reject) => {
+    const s = require('net').createServer();
+    s.on('error', reject);
+    s.listen(0, '127.0.0.1', () => {
+      const p = s.address().port;
+      s.close(() => resolve(p));
+    });
+  });
+}
+
+async function bootServer() {
+  if (!PORT) PORT = await pickFreePort();
+  child = spawn('node', ['server.js'], {
+    cwd: path.join(__dirname, '..'),
+    env: Object.assign({}, process.env, { PORT: String(PORT) }),
+    stdio: 'ignore',
+  });
+  const deadline = Date.now() + 20000;
+  while (Date.now() < deadline) {
+    try {
+      const s = await api('/api/health');
+      if (s && s.ok === true) return;
+    } catch (_) { /* not up yet */ }
+    await sleep(250);
+  }
+  throw new Error('e2e server did not become healthy on port ' + PORT);
+}
+
+function shutdownServer() {
+  try { if (child) child.kill(); } catch (_) { /* ignore */ }
+  child = null;
+}
 
 function api(path, method, body) {
   return new Promise((res, rej) => {
@@ -77,6 +117,12 @@ async function main() {
   console.log('============================================================');
   console.log('COMPREHENSIVE END-TO-END TEST (sequential)');
   console.log('============================================================');
+  let exitCode = 0;
+  try {
+    await bootServer();
+    console.log(`  (test server booted on 127.0.0.1:${PORT})`);
+    // BASE was built at module load with a placeholder port — re-point it now.
+    BASE.url = `http://127.0.0.1:${PORT}/`;
 
   await runTest('1. Server Health', async () => {
     const s = await api('/api/status');
@@ -170,32 +216,43 @@ async function main() {
     await new Promise((resolve) => {
       let settled = false;
       let timer = null;
-      const done = () => { if (!settled) { settled = true; if (timer) clearTimeout(timer); resolve(); } };
-      const req = http.get(`http://127.0.0.1:${PORT}/api/stream`, (res) => {
-        let data = '';
-        let chunks = 0;
+      let req = null;
+      const done = (fn) => {
+        if (settled) return;
+        settled = true;
+        if (timer) clearTimeout(timer);
+        try { if (req) req.destroy(); } catch (_) { /* ignore */ }
+        if (fn) fn();
+        resolve();
+      };
+      let data = '';
+      // Attach the error handler synchronously: if the server is unreachable
+      // the request errors before any response callback runs, and without
+      // this the process crashes on an unhandled 'error' event.
+      req = http.get(`http://127.0.0.1:${PORT}/api/stream`, (res) => {
         res.on('data', (chunk) => {
           if (settled) return;
           data += chunk.toString();
-          chunks++;
           if (data.includes(': heartbeat') && data.includes('data:')) {
-            res.destroy();
-            ok('SSE stream delivers data');
-            ok('SSE heartbeat present');
-            done();
+            done(() => {
+              ok('SSE stream delivers data');
+              ok('SSE heartbeat present');
+            });
           }
         });
-        req.on('error', (e) => { if (!settled) fail('SSE stream', e.message); done(); });
-        timer = setTimeout(() => {
-          if (settled) return;
-          res.destroy();
+        res.on('error', () => done());
+        res.on('close', () => done());
+      });
+      req.on('error', (e) => done(() => fail('SSE stream', e.message)));
+      timer = setTimeout(() => {
+        if (settled) return;
+        done(() => {
           if (data.includes('data:')) ok('SSE stream delivers data');
           else fail('SSE stream', 'no data');
           if (data.includes(': heartbeat')) ok('SSE heartbeat present');
           else fail('SSE heartbeat', 'no heartbeat after 10s');
-          done();
-        }, 10000);
-      });
+        });
+      }, 10000);
     });
   });
 
@@ -254,7 +311,14 @@ async function main() {
     issues.forEach(i => console.log(`  - ${i.name}: ${i.reason}`));
   }
   await stopEngine().catch(() => {});
-  process.exit(failed === 0 ? 0 : 1);
+    exitCode = failed === 0 ? 0 : 1;
+  } catch (e) {
+    console.error('e2e harness failed:', e && e.message ? e.message : e);
+    exitCode = 2;
+  } finally {
+    shutdownServer();
+  }
+  process.exit(exitCode);
 }
 
 main().catch((e) => { console.error(e); process.exit(2); });

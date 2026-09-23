@@ -13,8 +13,9 @@
     "apitest": "node scripts/apitest.js",
     "e2e": "node scripts/e2e-test.js",
     "authtest": "node scripts/authtest.js",
+    "proxytest": "node scripts/proxytest.js",
     "test": "node scripts/selftest.js && node scripts/apitest.js",
-    "test:all": "node scripts/selftest.js && node scripts/apitest.js"
+    "test:all": "node scripts/selftest.js && node scripts/apitest.js && node scripts/authtest.js && node scripts/proxytest.js && node scripts/e2e-test.js"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -130,10 +130,23 @@ Zero dependencies — everything is Node.js core (`http`, `https`, `crypto`-free
 
 ## Testing it
 
+One command runs everything (engine, API, auth, proxy/IP probe, full e2e):
+
 ```
-node scripts/selftest.js   # engine: steady, paced, flaky, stop, auto-abort
-node scripts/apitest.js    # server: safety gates, start/stop, stress, report
+npm run test:all
 ```
+
+Individual suites (each boots its own server — no manual setup):
+
+```
+npm run selftest    # engine: steady, paced, flaky, stop, auto-abort
+npm run apitest     # server: safety gates, start/stop, stress, report
+npm run authtest    # sign-in matrix: sessions, cookies, throttle, gates
+npm run proxytest   # IP-probe path + proxied load generation
+npm run e2e         # 14 full dashboard flows: load, stress, SSE, pacing…
+```
+
+`npm test` runs the fast pair (selftest + apitest) only.
 
 ## Scaling higher
 
